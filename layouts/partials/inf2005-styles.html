@@ -1,0 +1,122 @@
+<style>
+/* Boîtes pédagogiques INF 2005 : couleurs reprises du préambule LaTeX du cours */
+.inf2005-boite {
+  --inf-fond: #f8fafc;
+  --inf-cadre: #0b2545;
+  --inf-titre: #ffffff;
+  margin: 1.25rem 0;
+  border: 2px solid var(--inf-cadre);
+  border-radius: 6px;
+  background: var(--inf-fond);
+  color: #0f172a;
+  overflow: hidden;
+}
+.inf2005-boite-titre {
+  background: var(--inf-cadre);
+  color: var(--inf-titre);
+  font-weight: 700;
+  line-height: 1.4;
+  padding: .4rem 1rem;
+}
+.inf2005-boite-corps { padding: .75rem 1rem; }
+.inf2005-boite-corps > :first-child { margin-top: 0; }
+.inf2005-boite-corps > :last-child { margin-bottom: 0; }
+.inf2005-boite-corps p,
+.inf2005-boite-corps li,
+.inf2005-boite-corps strong,
+.inf2005-boite-corps em { color: inherit; }
+.inf2005-boite-corps a { color: #0b2545; text-decoration: underline; }
+.inf2005-boite-corps :not(pre) > code {
+  color: inherit;
+  background: rgba(11, 37, 69, .08);
+  border-radius: 3px;
+  padding: .1em .3em;
+}
+
+/* Un même thème regroupe les boîtes de même rôle d'un module à l'autre :
+   exemple = examplebox, exemplebox ; synthese = synthesebox, synthbox ; code = codebox, syntaxbox */
+.inf2005-boite--objectif  { --inf-fond: #dbeafe; --inf-cadre: #0b2545; }
+.inf2005-boite--definition { --inf-fond: #ecf7ff; --inf-cadre: #1d4ed8; }
+.inf2005-boite--important { --inf-fond: #fef9c3; --inf-cadre: #cc6600; }
+.inf2005-boite--remarque  { --inf-fond: #ccfbf1; --inf-cadre: #006666; }
+.inf2005-boite--attention { --inf-fond: #ffe4e6; --inf-cadre: #b30000; }
+.inf2005-boite--exemple,
+.inf2005-boite--contenu   { --inf-fond: #dcfce7; --inf-cadre: #008000; }
+.inf2005-boite--synthese  { --inf-fond: #ede9fe; --inf-cadre: #86002d; }
+.inf2005-boite--jupyter   { --inf-fond: #ffedd5; --inf-cadre: #e67300; }
+.inf2005-boite--code      { --inf-fond: #f8fafc; --inf-cadre: #b6bec7; --inf-titre: #0b2545; }
+
+/* Bloc « Contenu du module » de la page titre */
+.inf2005-boite--contenu { border-width: 1px; font-size: .92em; }
+
+/* Bloc de code dans une boîte « Extrait / pseudo-code » */
+.inf2005-boite--code .inf2005-boite-corps { padding: 0; }
+.inf2005-boite--code .highlight { margin: 0 !important; }
+.inf2005-boite--code pre {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  padding: .75rem 1rem !important;
+}
+
+/* Fiche descriptive du module (tableau de la page titre) */
+.inf2005-boite--fiche { border: 0; border-radius: 0; background: transparent; }
+.inf2005-boite--fiche .inf2005-boite-corps { padding: 0; }
+.inf2005-boite--fiche table {
+  display: table;
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: .92em;
+}
+.inf2005-boite--fiche thead { display: none; }
+.inf2005-boite--fiche td {
+  border: 1px solid #0b2545;
+  padding: .4rem .7rem;
+  background: #dbeafe;
+  color: #0f172a;
+  vertical-align: top;
+}
+.inf2005-boite--fiche td:first-child {
+  width: 32%;
+  background: #e2e5e9;
+  color: #0b2545;
+  font-weight: 700;
+}
+
+/* Tableaux du cours : shortcode « tableau », ou tableau placé dans une boîte (sauf la fiche) */
+.inf2005-tableau { margin: 1.25rem 0; overflow-x: auto; }
+.inf2005-tableau table,
+.inf2005-boite:not(.inf2005-boite--fiche) table {
+  display: table;
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: .95em;
+}
+.inf2005-tableau th,
+.inf2005-tableau td,
+.inf2005-boite:not(.inf2005-boite--fiche) th,
+.inf2005-boite:not(.inf2005-boite--fiche) td {
+  border: 1px solid #c2d8eb;
+  padding: .45rem .7rem;
+  background: #ffffff;
+  color: #0f172a;
+  text-align: left;
+  vertical-align: top;
+}
+.inf2005-tableau th,
+.inf2005-boite:not(.inf2005-boite--fiche) th { background: #0b2545; border-color: #0b2545; color: #ffffff; font-weight: 700; }
+.inf2005-tableau th code,
+.inf2005-boite:not(.inf2005-boite--fiche) th code { color: inherit; background: rgba(255, 255, 255, .15); }
+.inf2005-tableau tbody tr:nth-child(even) td,
+.inf2005-boite:not(.inf2005-boite--fiche) tbody tr:nth-child(even) td { background: #ecf7ff; }
+.inf2005-tableau a { color: #0b2545; text-decoration: underline; }
+
+/* Figures numérotées */
+.inf2005-figure { margin: 1.5rem auto; text-align: center; }
+.inf2005-figure img { display: inline-block; max-width: 100%; height: auto; }
+.inf2005-figure figcaption { margin-top: .5rem; font-size: .92em; }
+</style>

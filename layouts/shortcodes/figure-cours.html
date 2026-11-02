@@ -1,0 +1,29 @@
+{{- /*
+  Figure numérotée du cours INF 2005 (équivalent Hugo de l'environnement figure LaTeX).
+
+  Utilisation :
+    {{< figure-cours src="figures/figure_07.png" id="fig-figure-07" numero="1"
+        legende="Concept d’objet." largeur="82%" >}}
+
+  Paramètres :
+    src     : chemin de l'image (ressource du paquet de page ou URL)
+    id      : (facultatif) ancre visée par les renvois « figure N »
+    numero  : (facultatif) numéro affiché dans la légende
+    legende : (facultatif) texte de la légende
+    largeur : (facultatif) largeur de l'image, 82% par défaut
+    alt     : (facultatif) texte alternatif, la légende par défaut
+*/ -}}
+{{- $src := .Get "src" -}}
+{{- with .Page.Resources.Get $src }}{{ $src = .RelPermalink }}{{ end -}}
+{{- $legende := .Get "legende" | default "" -}}
+{{- $largeur := .Get "largeur" | default "82%" -}}
+{{- if eq .Ordinal 0 }}{{ partial "inf2005-styles.html" . }}{{ end -}}
+<figure class="inf2005-figure"{{ with .Get "id" }} id="{{ . }}"{{ end }}>
+  <img src="{{ $src }}" alt="{{ .Get "alt" | default $legende }}" style="{{ printf "width: %s" $largeur | safeCSS }}" loading="lazy">
+  {{- if or $legende (.Get "numero") }}
+  <figcaption>
+    {{- with .Get "numero" }}<span class="inf2005-figure-num">Figure {{ . }} – </span>{{ end -}}
+    {{ $legende | $.Page.RenderString }}
+  </figcaption>
+  {{- end }}
+</figure>

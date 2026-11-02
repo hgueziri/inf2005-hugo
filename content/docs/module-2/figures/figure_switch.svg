@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 552 353" width="552" height="353" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#000">
+  <title>Diagramme de contrôle de la structure switch.</title>
+  <defs>
+    <marker id="fleche" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#062354"/>
+    </marker>
+  </defs>
+  <rect width="552" height="353" fill="#ffffff"/>
+  <!-- Début et fin -->
+  <g fill="#ecf7ff" stroke="#062354" stroke-width="1.6">
+    <circle cx="276" cy="20" r="13"/>
+    <circle cx="276" cy="332" r="13"/>
+  </g>
+  <!-- Évaluation -->
+  <rect x="211.2" y="85" width="129.6" height="34" rx="6" fill="#ede7ff" stroke="#062354" stroke-width="1.6"/>
+  <!-- case 1, case 2, default -->
+  <rect x="9.6" y="175" width="117.6" height="64" rx="6" fill="#e6faf4" stroke="#008080" stroke-width="1.6"/>
+  <rect x="217.2" y="175" width="117.6" height="64" rx="6" fill="#e6faf4" stroke="#008080" stroke-width="1.6"/>
+  <rect x="424.8" y="175" width="117.6" height="45.6" rx="6" fill="#fff6e0" stroke="#cc6600" stroke-width="1.6"/>
+  <!-- Flèches -->
+  <g fill="none" stroke="#062354" stroke-width="1.6" marker-end="url(#fleche)">
+    <line x1="276" y1="33" x2="276" y2="85"/>
+    <line x1="243.6" y1="119" x2="127.2" y2="177.3"/>
+    <line x1="276" y1="119" x2="276" y2="175"/>
+    <line x1="312.8" y1="119" x2="434.2" y2="175"/>
+    <path d="M68.4,239 V332 H263"/>
+    <line x1="276" y1="239" x2="276" y2="319"/>
+    <path d="M483.6,220.6 V332 H289"/>
+  </g>
+  <g dominant-baseline="central" text-anchor="middle">
+    <text x="276" y="102">Évaluer <tspan font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">valeur</tspan></text>
+    <g font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">
+      <text x="68.4" y="190">case 1</text>
+      <text x="68.4" y="224">break</text>
+      <text x="276" y="190">case 2</text>
+      <text x="276" y="224">break</text>
+      <text x="483.6" y="189">default</text>
+    </g>
+    <text x="68.4" y="207">instructions</text>
+    <text x="276" y="207">instructions</text>
+    <text x="483.6" y="206">instructions</text>
+  </g>
+</svg>

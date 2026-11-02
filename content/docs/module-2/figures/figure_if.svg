@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 414 335" width="414" height="335" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#000">
+  <title>Diagramme de contrôle de la structure if.</title>
+  <defs>
+    <marker id="fleche" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#062354"/>
+    </marker>
+  </defs>
+  <rect width="414" height="335" fill="#ffffff"/>
+  <!-- Début et fin -->
+  <g fill="#ecf7ff" stroke="#062354" stroke-width="1.6">
+    <circle cx="74" cy="20" r="13"/>
+    <circle cx="74" cy="314" r="13"/>
+  </g>
+  <!-- Test -->
+  <polygon points="74,89 140,155 74,221 8,155" fill="#ffecb4" stroke="#062354" stroke-width="1.6"/>
+  <!-- Action si vrai -->
+  <rect x="252" y="132" width="153.6" height="46" rx="6" fill="#e6faf4" stroke="#008080" stroke-width="1.6"/>
+  <!-- Flèches -->
+  <g fill="none" stroke="#062354" stroke-width="1.6" marker-end="url(#fleche)">
+    <line x1="74" y1="33" x2="74" y2="89"/>
+    <line x1="140" y1="155" x2="252" y2="155"/>
+    <path d="M328.8,178 V314 H87"/>
+    <line x1="74" y1="221" x2="74" y2="301"/>
+  </g>
+  <g dominant-baseline="central">
+    <text x="74" y="155" text-anchor="middle" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">note &gt;= 50</text>
+    <text x="328.8" y="145" text-anchor="middle">Afficher</text>
+    <text x="328.8" y="164" text-anchor="middle" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">"Cours réussi"</text>
+    <text x="196" y="145" text-anchor="middle">Vrai</text>
+    <text x="68" y="261" text-anchor="end">Faux</text>
+  </g>
+</svg>

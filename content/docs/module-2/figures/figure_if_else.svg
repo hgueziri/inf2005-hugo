@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 339" width="680" height="339" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#000">
+  <title>Diagramme de contrôle de la structure if/else.</title>
+  <defs>
+    <marker id="fleche" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#062354"/>
+    </marker>
+  </defs>
+  <rect width="680" height="339" fill="#ffffff"/>
+  <!-- Début et fin -->
+  <g fill="#ecf7ff" stroke="#062354" stroke-width="1.6">
+    <circle cx="340" cy="20" r="13"/>
+    <circle cx="340" cy="318" r="13"/>
+  </g>
+  <!-- Test -->
+  <polygon points="340,87 406,153 340,219 274,153" fill="#ffecb4" stroke="#062354" stroke-width="1.6"/>
+  <!-- Action si faux / si vrai -->
+  <rect x="8.4" y="130" width="141.6" height="46" rx="6" fill="#ffecec" stroke="#a60000" stroke-width="1.6"/>
+  <rect x="530" y="130" width="141.6" height="46" rx="6" fill="#e6faf4" stroke="#008080" stroke-width="1.6"/>
+  <!-- Flèches -->
+  <g fill="none" stroke="#062354" stroke-width="1.6" marker-end="url(#fleche)">
+    <line x1="340" y1="33" x2="340" y2="87"/>
+    <line x1="274" y1="153" x2="150" y2="153"/>
+    <line x1="406" y1="153" x2="530" y2="153"/>
+    <path d="M79.2,176 V318 H327"/>
+    <path d="M600.8,176 V318 H353"/>
+  </g>
+  <g dominant-baseline="central" text-anchor="middle">
+    <text x="340" y="153" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">note &gt;= 50</text>
+    <text x="79.2" y="143">Afficher</text>
+    <text x="79.2" y="162" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">"Cours échoué"</text>
+    <text x="600.8" y="143">Afficher</text>
+    <text x="600.8" y="162" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">"Cours réussi"</text>
+    <text x="212" y="143">Faux</text>
+    <text x="468" y="143">Vrai</text>
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+{{- /*
+  Boîte pédagogique du cours INF 2005 (équivalent Hugo des tcolorbox du cours LaTeX).
+
+  Utilisation :
+    {{< boite type="exemple" >}}
+    Contenu en **Markdown** (listes, `code`, blocs de code, etc.).
+    {{< /boite >}}
+
+  Paramètres :
+    type  : objectif | definition | important | remarque | attention | exemple
+            | synthese | jupyter | code | contenu | fiche
+    titre : (facultatif) remplace le titre par défaut du type.
+*/ -}}
+{{- $titres := dict
+  "objectif"   "Objectifs d'apprentissage"
+  "definition" "Définition"
+  "important" "À retenir"
+  "remarque"  "Remarque pédagogique"
+  "attention" "Attention"
+  "exemple"   "Exemple"
+  "synthese"  "Synthèse"
+  "jupyter"   "Exécution dans Jupyter Notebook ou VS Code"
+  "code"      "Extrait / pseudo-code"
+-}}
+{{- $type := .Get "type" | default "remarque" -}}
+{{- $titre := .Get "titre" | default (index $titres $type) -}}
+{{- if eq .Ordinal 0 }}{{ partial "inf2005-styles.html" . }}{{ end -}}
+<div class="inf2005-boite inf2005-boite--{{ $type }}">
+  {{- with $titre }}
+  <div class="inf2005-boite-titre">{{ . }}</div>
+  {{- end }}
+  <div class="inf2005-boite-corps">
+{{ .InnerDeindent | .Page.RenderString (dict "display" "block") }}
+  </div>
+</div>

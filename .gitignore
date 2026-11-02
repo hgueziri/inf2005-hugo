@@ -1,0 +1,4 @@
+# Fichiers produits par Hugo (reconstruits à chaque publication)
+public/
+resources/_gen/
+.hugo_build.lock

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 427" width="470" height="427" font-family="Helvetica, Arial, sans-serif" font-size="14" fill="#000">
+  <title>Principe général d'une boucle contrôlée par une variable.</title>
+  <defs>
+    <marker id="fleche" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#062354"/>
+    </marker>
+  </defs>
+  <rect width="470" height="427" fill="#ffffff"/>
+  <!-- Blocs -->
+  <g fill="#ecf7ff" stroke="#062354" stroke-width="1.6">
+    <rect x="45.2" y="9" width="141.6" height="46" rx="6"/>
+    <rect x="45.2" y="279" width="141.6" height="46" rx="6"/>
+    <rect x="45.2" y="373" width="141.6" height="46" rx="6"/>
+    <rect x="320" y="150" width="141.6" height="34" rx="6"/>
+  </g>
+  <!-- Test -->
+  <polygon points="116,103 180,167 116,231 52,167" fill="#fff6e0" stroke="#cc6600" stroke-width="1.6"/>
+  <!-- Flèches -->
+  <g fill="none" stroke="#062354" stroke-width="1.6" marker-end="url(#fleche)">
+    <line x1="116" y1="55" x2="116" y2="103"/>
+    <line x1="116" y1="231" x2="116" y2="279"/>
+    <line x1="116" y1="325" x2="116" y2="373"/>
+    <path d="M45.2,396 H13.2 V167 H52"/>
+    <line x1="180" y1="167" x2="320" y2="167"/>
+  </g>
+  <g dominant-baseline="central" text-anchor="middle">
+    <text x="116" y="23">Initialiser</text>
+    <text x="116" y="42" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">test = 1</text>
+    <text x="116" y="167"><tspan font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">test &lt;= 10</tspan> ?</text>
+    <text x="116" y="293">Exécuter le corps</text>
+    <text x="116" y="312" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">somme += test</text>
+    <text x="116" y="387">Itération</text>
+    <text x="116" y="406" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">test++</text>
+    <text x="390.8" y="167">Sortie de la boucle</text>
+    <text x="250" y="157">Faux</text>
+    <text x="108" y="255" text-anchor="end">Vrai</text>
+  </g>
+</svg>
