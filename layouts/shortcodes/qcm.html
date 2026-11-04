@@ -1,0 +1,166 @@
+{{- /*
+  Questionnaire d'autoévaluation à choix multiple, non noté : la rétroaction s'affiche dès qu'une
+  réponse est choisie ; rien n'est enregistré ni transmis.
+
+  Utilisation : {{< qcm >}} dans une page dont le front matter contient :
+    qcm:
+      - question: "Énoncé (Markdown en ligne, ex. `code`)"
+        code: |                    # facultatif : extrait C++ affiché sous l'énoncé
+          int x = 3;
+        choix:                     # 2 à 5 choix (Markdown en ligne)
+          - "Premier choix"
+          - "Deuxième choix"
+        reponse: 2                 # numéro du bon choix (1 = premier)
+        explication: "Pourquoi"    # Markdown en ligne
+        revoir: "identifiant"      # facultatif : identifiant du titre de la section à revoir
+        page: "/docs/modules/..."  # facultatif : page de cette section (par défaut, le module parent)
+        contexte: |                # facultatif : mise en situation (Markdown en blocs) ; l'énoncé
+          Texte du contexte.       #   s'affiche alors après le contexte et le code
+        choix_code: true           # facultatif : chaque choix est un extrait C++ affiché en bloc
+        partie: "Partie A — ..."   # facultatif : titre affiché quand la partie change
+  Le lien « Revoir » reprend le titre de la section ; la compilation échoue si la section n'existe pas.
+  Paramètre facultatif du shortcode : bouton="Texte du bouton Recommencer".
+*/ -}}
+{{- $questions := .Page.Params.qcm -}}
+{{- $lettres := slice "A" "B" "C" "D" "E" -}}
+{{- $bouton := .Get "bouton" | default "Recommencer le questionnaire" -}}
+{{- $partie := "" -}}
+<style>
+.inf2005-qcm-question { margin: 1.25rem 0; padding: 1rem 1.1rem; border: 1px solid #c2d8eb; border-radius: 6px; background: #ffffff; }
+.inf2005-qcm-num { display: inline-block; margin-bottom: .4rem; padding: .1rem .55rem; border-radius: 4px; background: #0b2545; color: #ffffff; font-size: .85em; font-weight: 700; }
+.inf2005-qcm-enonce { font-weight: 600; margin-bottom: .6rem; }
+.inf2005-qcm-question .highlight { margin: .5rem 0 .75rem; }
+.inf2005-qcm-choix label {
+  display: flex; align-items: baseline; gap: .6rem; margin: .4rem 0; padding: .45rem .7rem;
+  border: 1px solid #e2e8f0; border-radius: 4px; cursor: pointer;
+}
+.inf2005-qcm-choix label:hover { background: #f1f5f9; }
+.inf2005-qcm-choix input { accent-color: #0b2545; }
+.inf2005-qcm-lettre { font-weight: 700; color: #0b2545; }
+.inf2005-qcm-question.repondue label { cursor: default; }
+.inf2005-qcm-question.repondue label:hover { background: transparent; }
+.inf2005-qcm-choix label.correct, .inf2005-qcm-choix label.correct:hover { background: #dcfce7; border-color: #008000; }
+.inf2005-qcm-choix label.incorrect, .inf2005-qcm-choix label.incorrect:hover { background: #ffe4e6; border-color: #b30000; }
+.inf2005-qcm-retroaction { margin-top: .75rem; padding: .6rem .9rem; border-left: 4px solid #0b2545; background: #f8fafc; }
+.inf2005-qcm-retroaction p { margin: .3rem 0; }
+.inf2005-qcm-verdict { font-weight: 700; }
+.bonne .inf2005-qcm-verdict { color: #006400; }
+.mauvaise .inf2005-qcm-verdict { color: #b30000; }
+.inf2005-qcm-partie { margin: 2.25rem 0 .5rem; color: #0b2545; }
+.inf2005-qcm-contexte { margin-bottom: .5rem; }
+.inf2005-qcm-contexte p, .inf2005-qcm-contexte ul { margin: .4rem 0; }
+.inf2005-qcm-choix-code { flex: 1; min-width: 0; }
+.inf2005-qcm-choix-code .highlight { margin: 0; }
+.inf2005-qcm-choix-code pre { overflow-x: auto; }
+.inf2005-qcm-bilan { margin: 1.5rem 0 .75rem; padding: .75rem 1rem; border-radius: 6px; background: #ecf7ff; border: 1px solid #c2d8eb; font-weight: 600; }
+.inf2005-qcm button {
+  font: inherit; font-size: .9em; cursor: pointer;
+  border: 1px solid #0b2545; border-radius: 4px; padding: .35rem .9rem; background: #0b2545; color: #ffffff;
+}
+</style>
+<div class="inf2005-qcm">
+  {{- range $i, $q := $questions }}
+  {{- $n := add $i 1 }}
+  {{- if or (lt (int $q.reponse) 1) (gt (int $q.reponse) (len $q.choix)) }}
+    {{- errorf "qcm %s, question %d : reponse %v hors des choix" $.Page.Path $n $q.reponse }}
+  {{- end }}
+  {{- with $q.partie }}{{ if ne . $partie }}
+  <h3 class="inf2005-qcm-partie">{{ . | $.Page.RenderString }}</h3>
+  {{- $partie = . }}{{ end }}{{ end }}
+  <div class="inf2005-qcm-question" role="group" aria-labelledby="qcm-enonce-{{ $n }}" data-reponse="{{ $q.reponse }}">
+    <span class="inf2005-qcm-num">Question {{ $n }}</span>
+    {{- $code := "" }}
+    {{- with $q.code }}{{ $code = $.Page.RenderString (dict "display" "block") (printf "```cpp\n%s\n```" (strings.TrimRight "\n" .)) }}{{ end }}
+    {{- $enonce := $q.question | $.Page.RenderString }}
+    {{- with $q.contexte }}
+    <div class="inf2005-qcm-contexte">{{ $.Page.RenderString (dict "display" "block") . }}</div>
+    {{ $code }}
+    <div class="inf2005-qcm-enonce" id="qcm-enonce-{{ $n }}">{{ $enonce }}</div>
+    {{- else }}
+    <div class="inf2005-qcm-enonce" id="qcm-enonce-{{ $n }}">{{ $enonce }}</div>
+    {{ $code }}
+    {{- end }}
+    <div class="inf2005-qcm-choix">
+      {{- range $j, $c := $q.choix }}
+      <label><input type="radio" name="qcm-{{ $n }}" value="{{ add $j 1 }}"><span class="inf2005-qcm-lettre">{{ index $lettres $j }}</span>
+        {{- if $q.choix_code }}<span class="inf2005-qcm-choix-code">{{ $.Page.RenderString (dict "display" "block") (printf "```cpp\n%s\n```" (strings.TrimRight "\n" $c)) }}</span>
+        {{- else }}<span>{{ $c | $.Page.RenderString }}</span>{{ end }}</label>
+      {{- end }}
+    </div>
+    <div class="inf2005-qcm-retroaction" aria-live="polite" hidden>
+      <p class="inf2005-qcm-verdict"></p>
+      <p>{{ $q.explication | $.Page.RenderString }}</p>
+      {{- with $q.revoir }}
+      {{- $cible := $.Page.Parent }}
+      {{- with $q.page }}{{ $cible = site.GetPage . }}{{ end }}
+      {{- with index $cible.Fragments.HeadingsMap . }}
+      <p><a href="{{ $cible.RelPermalink }}#{{ .ID }}">Revoir : {{ .Title | safeHTML }}</a></p>
+      {{- else }}
+      {{- errorf "qcm %s, question %d : section « %s » introuvable dans %s" $.Page.Path $n . $cible.Path }}
+      {{- end }}
+      {{- end }}
+    </div>
+  </div>
+  {{- end }}
+  <p class="inf2005-qcm-bilan" aria-live="polite"></p>
+  <button type="button" data-action="recommencer">{{ $bouton }}</button>
+</div>
+<script>
+(function () {
+  var qcm = document.currentScript.previousElementSibling;
+  var questions = Array.prototype.slice.call(qcm.querySelectorAll(".inf2005-qcm-question"));
+  var bilan = qcm.querySelector(".inf2005-qcm-bilan");
+
+  function majBilan() {
+    var n = questions.length;
+    var repondues = qcm.querySelectorAll(".repondue").length;
+    var bonnes = qcm.querySelectorAll(".bonne").length;
+    if (!repondues) {
+      bilan.textContent = n + " questions : choisissez une réponse pour afficher l'explication.";
+      return;
+    }
+    var t = "Bonnes réponses : " + bonnes + " sur " + repondues + (repondues > 1 ? " questions répondues" : " question répondue") + " (" + n + " au total).";
+    if (repondues === n) {
+      if (bonnes === n) t += " Excellent : toutes les notions sont bien comprises !";
+      else if (bonnes >= 0.7 * n) t += " Bon travail ! Revoyez les sections indiquées sous les questions manquées.";
+      else t += " Revoyez les sections indiquées sous les questions manquées, puis recommencez.";
+    }
+    bilan.textContent = t;
+  }
+
+  // Première réponse choisie : on corrige, on montre la bonne réponse et l'explication
+  qcm.addEventListener("change", function (e) {
+    var choisi = e.target;
+    var q = choisi.closest(".inf2005-qcm-question");
+    if (!q || q.classList.contains("repondue")) return;
+    var bonne = q.getAttribute("data-reponse");
+    var juste = choisi.value === bonne;
+    q.classList.add("repondue", juste ? "bonne" : "mauvaise");
+    Array.prototype.forEach.call(q.querySelectorAll("input"), function (r) {
+      r.disabled = true;
+      if (r.value === bonne) r.parentNode.classList.add("correct");
+      else if (r === choisi) r.parentNode.classList.add("incorrect");
+    });
+    var lettre = q.querySelector("label.correct .inf2005-qcm-lettre").textContent;
+    q.querySelector(".inf2005-qcm-verdict").textContent = juste ? "Bonne réponse !" : "Pas tout à fait : la bonne réponse est " + lettre + ".";
+    q.querySelector(".inf2005-qcm-retroaction").hidden = false;
+    majBilan();
+  });
+
+  qcm.querySelector('[data-action="recommencer"]').addEventListener("click", function () {
+    questions.forEach(function (q) {
+      q.classList.remove("repondue", "bonne", "mauvaise");
+      Array.prototype.forEach.call(q.querySelectorAll("input"), function (r) {
+        r.checked = false;
+        r.disabled = false;
+        r.parentNode.classList.remove("correct", "incorrect");
+      });
+      q.querySelector(".inf2005-qcm-retroaction").hidden = true;
+    });
+    majBilan();
+    qcm.scrollIntoView({ behavior: "smooth" });
+  });
+
+  majBilan();
+})();
+</script>

@@ -3,6 +3,7 @@ title: "Module 5 : Programmation parallèle, distribuée et réseau en C++"
 linkTitle: "Module 5"
 description: "INF 2005 – Programmation orientée objet avec C++"
 weight: 50
+bookCollapseSection: true
 ---
 
 {{< figure-cours src="figures/banner_5.png" alt="Bannière du cours INF 2005 – Programmation orientée objet avec C++" largeur="100%" >}}
@@ -25,16 +26,6 @@ weight: 50
 
 {{< boite type="contenu" >}}
 **Contenu du module :** comprendre les bases de la programmation parallèle, distribuée et réseau en C++, puis savoir tester des exemples simples dans un environnement moderne.
-{{< /boite >}}
-
-{{< boite type="fiche" >}}
-| | |
-|---|---|
-| Cours | INF 2005 – Programmation orientée objet avec C++ |
-| Document | Texte 5 – Programmation parallèle, distribuée et réseau |
-| Thèmes principaux | Parallélisme, systèmes distribués, multitâche, threads, POSIX, mutex, sockets, programmation réseau, bibliothèques scientifiques et patrons de classes |
-| Environnement recommandé | Jupyter Notebook et VS Code avec `g++` |
-| Norme recommandée | C++17 ou version plus récente |
 {{< /boite >}}
 
 ## Table des matières {#table-des-matieres}
@@ -213,6 +204,10 @@ g++ -std=c++17 main.cpp -o main -pthread
 Les appels à `join()` attendent la fin des threads avant la sortie de `main()`. Les deux messages peuvent apparaître dans un ordre différent selon l'exécution ; leurs caractères peuvent aussi s'entrelacer à l'affichage. Ne supposez donc pas que le premier thread créé affiche toujours son message en premier.
 {{< /boite >}}
 
+{{< boite type="attention" >}}
+Un objet `std::thread` doit être joint avec `join()` avant d'être détruit. S'il est détruit sans avoir été joint, par exemple à la fin du bloc où il a été créé, le programme est arrêté brutalement par `std::terminate()`, même si le thread a terminé son travail. Par ailleurs, la création d'un thread a un coût : pour traiter un grand nombre de petites tâches, on répartit le travail en quelques blocs, de l'ordre d'un par cœur, plutôt que de créer un thread par tâche.
+{{< /boite >}}
+
 ### 3.3. Utilisation de POSIX {#utilisation-de-posix}
 
 POSIX propose une API pour les threads, disponible surtout dans les environnements Unix/Linux. Les fonctions importantes sont :
@@ -290,6 +285,8 @@ int main() {
 {{< boite type="attention" >}}
 Le programme affiche normalement `Compteur = 2000` : chaque thread ajoute 1 au compteur mille fois. Le garde `std::lock_guard` verrouille le mutex à sa construction et le libère automatiquement à la fin du bloc. Sans cette protection, une *data race* rendrait le comportement indéfini ; il ne s'agit pas seulement d'un résultat qui varie.
 {{< /boite >}}
+
+Une course aux données suppose qu'au moins un thread modifie la donnée partagée. Des données préparées avant la création des threads, puis seulement lues, peuvent donc être partagées sans mutex ; y accéder au moyen d'une référence constante garantit, dès la compilation, qu'aucun thread ne les modifie.
 
 ## 4. Introduction à la programmation réseau {#introduction-a-la-programmation-reseau}
 
@@ -511,6 +508,8 @@ int main() {
     return 0;
 }
 ```
+
+Lors de l'appel, le compilateur déduit le type `T` des arguments : `int` pour `maximum(4, 9)` et `double` pour `maximum(3.5, 2.1)`. Les deux arguments doivent alors avoir le même type : `maximum(3, 4.5)` ne compile pas, car `T` ne peut pas être à la fois `int` et `double`. On peut aussi imposer le type entre chevrons : avec `maximum<double>(3, 4.5)`, l'entier 3 est converti en `double`.
 
 {{< boite type="important" >}}
 Les templates et la STL sont essentiels en C++ moderne. Ils permettent de construire du code réutilisable tout en conservant la vérification des types par le compilateur.

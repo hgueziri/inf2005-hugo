@@ -3,6 +3,7 @@ title: "Module 1 : Introduction à l'approche orientée objet"
 linkTitle: "Module 1"
 description: "INF 2005 – Programmation orientée objet avec C++"
 weight: 10
+bookCollapseSection: true
 ---
 
 {{< figure-cours src="figures/banner_1.png" alt="Bannière du cours INF 2005 – Programmation orientée objet avec C++" largeur="100%" >}}
@@ -23,16 +24,6 @@ weight: 10
 
 {{< boite type="contenu" >}}
 **Contenu du module :** comprendre les fondements de l'approche orientée objet et savoir distinguer les notions d'objet, de classe, d'encapsulation, d'abstraction, d'héritage et de polymorphisme.
-{{< /boite >}}
-
-{{< boite type="fiche" >}}
-| | |
-|---|---|
-| Cours | INF 2005 – Programmation orientée objet avec C++ |
-| Document | Module 1 – Introduction à l'approche orientée objet |
-| Thèmes principaux | Encapsulation, classes, objets, abstraction, héritage, polymorphisme et conception orientée objet |
-| Environnement recommandé | Jupyter Notebook et VS Code avec `g++` |
-| Norme recommandée | C++17 ou version plus récente |
 {{< /boite >}}
 
 ## Table des matières {#table-des-matieres}
@@ -323,6 +314,15 @@ Il s’agit d’un problème de partage efficace des connaissances. La classe es
 
 {{< boite type="important" >}}
 Pour un premier contact, retenons surtout la relation « est un » : un rectangle est un polygone. L’héritage multiple et la résolution de conflits seront approfondis plus tard; les figures précédentes sont conservées pour illustrer des hiérarchies, et non pour enseigner leur syntaxe C++.
+{{< /boite >}}
+
+{{< boite type="remarque" >}}
+Quelques repères aident à choisir entre la relation « est un » et la relation « a un » :
+
+- un objet ne change jamais de classe : un rôle qui peut changer au cours du temps, comme le statut d'un étudiant à temps plein ou à temps partiel, se représente par un attribut, et non par une classe dérivée ;
+- une donnée qui décrit le lien entre deux objets, et non l'un d'eux, appartient à une classe qui représente ce lien : la note obtenue dans un cours ne décrit ni l'étudiant seul, ni le cours seul, mais l'inscription de cet étudiant à ce cours ;
+- un objet peut **posséder** ses composantes, qui disparaissent avec lui (une commande et ses lignes), ou seulement **utiliser** un objet qui existe sans lui (une commande et son client).
+
 {{< /boite >}}
 
 ### 5.2. Le polymorphisme {#le-polymorphisme}

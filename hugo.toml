@@ -9,10 +9,19 @@ theme = 'hugo-book'
 
 [markup.tableOfContents]
   startLevel = 2
-  endLevel = 4          # sections, sous-sections et sous-sous-sections
+  endLevel = 3          # sections et sous-sections seulement
 
 [params]
   BookSection = 'docs'  # les pages de content/docs/ forment le menu, dans l'ordre de leur weight
   BookTheme = 'light'   # les boîtes du cours sont prévues pour un fond clair
   BookToC = true        # table des matières à droite de chaque page
   BookSearch = true
+
+# Signalement anonyme des erreurs (page docs/signaler-une-erreur.md, lien sous chaque page)
+[params.signalement]
+  # Lien du formulaire anonyme (Microsoft Forms : Collecter les réponses > Intégrer, adresse src de l'iframe ;
+  # Google Forms : Envoyer > <>, adresse src de l'iframe). Vide = page affichée sans formulaire.
+  formulaire = 'https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=MyPn1A0bvEi4pxc-5igeO6zbWNC0nKtBoCjFG_p_lGZUNjBRRU1ZVEZaOTJJTFdTS0RTTEZDSFVNVi4u&embed=true'
+  # Facultatif : lien prérempli du même formulaire, où la réponse à la question « Page concernée »
+  # est le mot PAGE ; il est remplacé par le titre de la page d'où vient l'étudiant.
+  prerempli = ''

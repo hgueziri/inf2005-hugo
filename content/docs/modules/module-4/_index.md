@@ -3,6 +3,7 @@ title: "Module 4 : Héritage, polymorphisme et notions avancées essentielles"
 linkTitle: "Module 4"
 description: "INF 2005 – Programmation orientée objet avec C++"
 weight: 40
+bookCollapseSection: true
 ---
 
 {{< figure-cours src="figures/banner_4.png" alt="Bannière du cours INF 2005 – Programmation orientée objet avec C++" largeur="100%" >}}
@@ -25,16 +26,6 @@ weight: 40
 
 {{< boite type="contenu" >}}
 **Contenu du module :** mettre en pratique les classes, les relations d'héritage et le polymorphisme, puis découvrir des mécanismes C++ complémentaires.
-{{< /boite >}}
-
-{{< boite type="fiche" >}}
-| | |
-|---|---|
-| Cours | INF 2005 – Programmation orientée objet avec C++ |
-| Document | Module 4 – Héritage et programmation objet |
-| Thèmes principaux | Classes, constructeurs, héritage, fonctions virtuelles, polymorphisme, surcharge d'opérateurs, fichiers et notions STL |
-| Environnement recommandé | Jupyter Notebook et VS Code avec `g++` |
-| Norme recommandée | C++17 ou version plus récente |
 {{< /boite >}}
 
 ## Table des matières {#table-des-matieres}
@@ -147,6 +138,14 @@ Cahier : 5 en stock
 Le mot clé `class` décrit le type; la déclaration `Article livre(...);` crée un objet de ce type. Les valeurs des attributs appartiennent à chaque objet, mais les comportements sont définis par la classe.
 {{< /boite >}}
 
+{{< boite type="remarque" titre="Remarque" >}}
+
+- Une classe peut offrir plusieurs constructeurs, qui se distinguent par leurs paramètres, comme des fonctions surchargées (module 3) : le compilateur choisit celui qui correspond aux arguments donnés à la création de l'objet.
+- Seules les méthodes déclarées `const` peuvent être appelées sur un objet constant ou au moyen d'une référence constante, comme `const Article& a` : déclarez donc `const` toute méthode qui ne modifie pas l'objet.
+- Un accesseur qui renvoie une référence non constante vers un attribut privé, par exemple `std::string& getNom()`, permet de modifier cet attribut de l'extérieur, comme s'il était public. Un accesseur renvoie plutôt une copie ou une référence constante, par exemple `const std::string& getNom() const`.
+
+{{< /boite >}}
+
 ### 1.3. Exercice guidé : modifier puis vérifier {#exercice-guide-modifier-puis-verifier}
 
 1. Créez un fichier `article.cpp`, copiez le programme et compilez-le avec `g++ -std=c++17 article.cpp -o article`. Exécutez-le.
@@ -183,32 +182,31 @@ Exemple complet : la classe spécialisée réutilise le constructeur et la méth
 ```cpp {linenos=table}
 #include <iostream>
 #include <string>
-using namespace std;
 
 class Personne {
 protected:
-    string nom;
-    string prenom;
+    std::string nom;
+    std::string prenom;
 
 public:
-    Personne(string n, string p) : nom(n), prenom(p) {}
+    Personne(std::string n, std::string p) : nom(n), prenom(p) {}
 
     void afficherIdentite() const {
-        cout << prenom << " " << nom << endl;
+        std::cout << prenom << " " << nom << std::endl;
     }
 };
 
 class PersonnelInformatique : public Personne {
 private:
-    string specialite;
+    std::string specialite;
 
 public:
-    PersonnelInformatique(string n, string p, string s)
+    PersonnelInformatique(std::string n, std::string p, std::string s)
         : Personne(n, p), specialite(s) {}
 
     void afficherProfil() const {
         afficherIdentite();
-        cout << "Specialite : " << specialite << endl;
+        std::cout << "Specialite : " << specialite << std::endl;
     }
 };
 
@@ -260,18 +258,17 @@ Exemple :
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 class Base {
 public:
-    Base()  { cout << "Constructeur Base" << endl; }
-    ~Base() { cout << "Destructeur Base" << endl; }
+    Base()  { std::cout << "Constructeur Base" << std::endl; }
+    ~Base() { std::cout << "Destructeur Base" << std::endl; }
 };
 
 class Derivee : public Base {
 public:
-    Derivee()  { cout << "Constructeur Derivee" << endl; }
-    ~Derivee() { cout << "Destructeur Derivee" << endl; }
+    Derivee()  { std::cout << "Constructeur Derivee" << std::endl; }
+    ~Derivee() { std::cout << "Destructeur Derivee" << std::endl; }
 };
 
 int main() {
@@ -294,6 +291,8 @@ Destructeur Base
 {{< boite type="remarque" titre="Remarque" >}}
 Pour une classe de base dont le constructeur attend des paramètres, la classe dérivée doit initialiser cette partie de l'objet, comme dans l'appel `Personne(n, p)`. Le destructeur d'une base destinée à être supprimée via un pointeur sur cette base sera normalement virtuel, un point approfondi dans la section sur le polymorphisme.
 {{< /boite >}}
+
+Le destructeur est appelé automatiquement lorsque l'objet cesse d'exister, par exemple à la sortie du bloc où il a été déclaré, que l'on en sorte normalement ou par un `return`. C'est donc l'endroit approprié pour libérer une ressource acquise par le constructeur, comme un fichier ou une connexion : sa libération ne peut plus être oubliée. Les flots de fichiers (section 7) se ferment ainsi automatiquement, et `std::lock_guard` (module 5) libère son mutex de la même manière.
 
 ## 3. Polymorphisme et fonctions virtuelles {#polymorphisme-et-fonctions-virtuelles}
 
@@ -343,6 +342,8 @@ int main() {
 {{< boite type="attention" >}}
 Si la méthode `dessiner()` de la classe de base n'était pas virtuelle, l'appel via la référence `Figure&` sélectionnerait la version de `Figure`, même lorsque l'objet réel est un `Cercle`. Le polymorphisme n'est donc pas simplement le fait de donner le même nom à deux méthodes.
 {{< /boite >}}
+
+Pour redéfinir une fonction virtuelle, la méthode de la classe dérivée doit avoir exactement la même signature, qualificatif `const` compris. Dans `Cercle`, une méthode `void dessiner()` sans `const` serait une nouvelle méthode, qui ne redéfinit pas celle de `Figure` : l'appel au moyen de `Figure&` exécuterait toujours la version de `Figure`. Avec `override`, le compilateur signale cette erreur.
 
 ### 3.2. Fonctions virtuelles pures et classes abstraites {#fonctions-virtuelles-pures-et-classes-abstraites}
 
@@ -403,6 +404,10 @@ int main() {
 Pour les premiers exercices, retenez surtout la combinaison `virtual` dans la base, `override` dans les classes dérivées et un appel via une référence ou un pointeur de type base. `vector` et `unique_ptr` sont des outils complémentaires ; leur fonctionnement détaillé n'est pas nécessaire pour comprendre l'appel polymorphe.
 {{< /boite >}}
 
+{{< boite type="attention" >}}
+Le polymorphisme exige de manipuler les objets dérivés au moyen de pointeurs ou de références vers la classe de base. Si `Figure` n'était pas abstraite, un `std::vector<Figure>` ne contiendrait que des objets `Figure` : en y copiant un `Cercle`, on ne conserverait que sa partie `Figure`. C'est le **découpage** de l'objet (*slicing*), et `dessiner()` exécuterait alors la version de `Figure`. Le même découpage se produit lorsqu'un objet dérivé est passé par valeur à un paramètre de type `Figure`.
+{{< /boite >}}
+
 ### 3.4. Application : spécialisation des articles {#application-specialisation-des-articles}
 
 La dérivation permet de créer une classe plus spécifique. La redéfinition permet à une classe dérivée de fournir sa propre version d'une méthode héritée. Le polymorphisme permet ensuite d'appeler la bonne méthode à partir d'une référence ou d'un pointeur de la classe de base.
@@ -412,17 +417,16 @@ Reprenons l'exemple d'inventaire du module 1. Une boisson est un article ; une b
 ```cpp {linenos=table}
 #include <iostream>
 #include <string>
-using namespace std;
 
 class Article {
 protected:
-    string nom;
+    std::string nom;
     double prix;
     int quantite;
     double coefficientTaxe;
 
 public:
-    Article(string n, double p, int q = 0, double t = 1.15)
+    Article(std::string n, double p, int q = 0, double t = 1.15)
         : nom(n), prix(p), quantite(q), coefficientTaxe(t) {}
 
     virtual ~Article() = default;
@@ -432,7 +436,7 @@ public:
     }
 
     virtual void afficher() const {
-        cout << nom << " : " << prixAvecTaxe() << endl;
+        std::cout << nom << " : " << prixAvecTaxe() << std::endl;
     }
 };
 
@@ -441,7 +445,7 @@ protected:
     int volume;
 
 public:
-    Boisson(string n, double p, int v, int q = 0)
+    Boisson(std::string n, double p, int v, int q = 0)
         : Article(n, p, q), volume(v) {}
 
     int getVolume() const { return volume; }
@@ -452,7 +456,7 @@ private:
     double majoration;
 
 public:
-    BoissonAlcoolisee(string n, double p, int v, double tA, int q = 0)
+    BoissonAlcoolisee(std::string n, double p, int v, double tA, int q = 0)
         : Boisson(n, p, v, q), majoration(tA) {}
 
     double prixAvecTaxe() const override {
@@ -492,7 +496,6 @@ L'héritage simple relie une classe dérivée à une seule classe de base. L'hé
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 class Point {
 protected:
@@ -503,7 +506,7 @@ public:
         y = ord;
     }
     void afficher() const {
-        cout << "(" << x << ", " << y << ")";
+        std::cout << "(" << x << ", " << y << ")";
     }
 };
 
@@ -515,7 +518,7 @@ public:
         codeCouleur = c;
     }
     void afficher() const {
-        cout << "couleur " << codeCouleur;
+        std::cout << "couleur " << codeCouleur;
     }
 };
 
@@ -528,9 +531,9 @@ public:
 
     void afficher() const {
         Point::afficher();
-        cout << " avec ";
+        std::cout << " avec ";
         Couleur::afficher();
-        cout << endl;
+        std::cout << std::endl;
     }
 };
 
@@ -564,7 +567,6 @@ Une classe abstraite peut définir une interface commune sans imposer toute l'im
 #include <iostream>
 #include <vector>
 #include <memory>
-using namespace std;
 
 class Dessinable {
 public:
@@ -584,7 +586,7 @@ private:
 
 public:
     void dessiner() const override {
-        cout << "Dessiner la navette en (" << x << ", " << y << ")" << endl;
+        std::cout << "Dessiner la navette en (" << x << ", " << y << ")" << std::endl;
     }
 
     void deplacer(int dx, int dy) override {
@@ -606,7 +608,6 @@ La surcharge se fait avec le mot clé `operator`. Par exemple, pour additionner 
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 class Complexe {
 private:
@@ -621,7 +622,7 @@ public:
     }
 
     void afficher() const {
-        cout << reel << " + " << imaginaire << "i" << endl;
+        std::cout << reel << " + " << imaginaire << "i" << std::endl;
     }
 };
 
@@ -637,6 +638,36 @@ int main() {
 La notation `c1 + c2` appelle ici `c1.operator+(c2)`. L'opération crée un nouvel objet `Complexe` sans modifier les deux objets initiaux.
 {{< /boite >}}
 
+Les opérateurs de comparaison se surchargent de la même manière et renvoient un `bool`. L'opérateur `==` compare les valeurs des attributs : deux objets distincts peuvent être égaux. L'opérateur `<` définit un ordre entre les objets ; c'est lui que `std::sort` utilise pour trier les objets d'une classe (annexe du module 4).
+
+```cpp {linenos=table}
+class Date {
+private:
+    int annee;
+    int mois;
+    int jour;
+
+public:
+    Date(int a, int m, int j) : annee(a), mois(m), jour(j) {}
+
+    bool operator==(const Date& autre) const {
+        return annee == autre.annee && mois == autre.mois && jour == autre.jour;
+    }
+
+    bool operator<(const Date& autre) const {
+        if (annee != autre.annee) {
+            return annee < autre.annee;
+        }
+        if (mois != autre.mois) {
+            return mois < autre.mois;
+        }
+        return jour < autre.jour;
+    }
+};
+```
+
+Avec ces deux opérateurs, on peut écrire `if (echeance == aujourdhui)` ou trier un `std::vector<Date>` avec `std::sort`.
+
 ### 5.2. Limitations {#limitations}
 
 Tous les opérateurs ne peuvent pas être surchargés. Il est notamment impossible de changer la priorité, l'associativité ou le nombre d'opérandes d'un opérateur. La surcharge doit rester cohérente avec le sens habituel de l'opérateur.
@@ -651,7 +682,6 @@ Les opérateurs `<<` et `>>` peuvent être surchargés pour afficher ou lire des
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 class Point {
 private:
@@ -660,7 +690,7 @@ private:
 public:
     Point(double abs = 0, double ord = 0) : x(abs), y(ord) {}
 
-    friend ostream& operator<<(ostream& os, const Point& p) {
+    friend std::ostream& operator<<(std::ostream& os, const Point& p) {
         os << "(" << p.x << ", " << p.y << ")";
         return os;
     }
@@ -668,10 +698,12 @@ public:
 
 int main() {
     Point p(2.5, 4.0);
-    cout << p << endl;
+    std::cout << p << std::endl;
     return 0;
 }
 ```
+
+L'opérateur `<<` ne peut pas être une méthode de `Point` : dans `std::cout << p`, l'opérande de gauche est le flot, et non l'objet. On le définit donc comme une fonction non membre, qui reçoit le flot et l'objet ; elle est déclarée amie (`friend`, section suivante) pour accéder aux attributs privés. Elle renvoie le flot par référence, ce qui permet d'enchaîner les écritures, comme dans `std::cout << p << std::endl;`.
 
 ## 6. Fonctions et classes amies {#fonctions-et-classes-amies}
 
@@ -683,7 +715,6 @@ Une fonction amie est une fonction qui n'est pas membre d'une classe, mais qui e
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 class Compte {
 private:
@@ -696,7 +727,7 @@ public:
 };
 
 void afficherSolde(const Compte& c) {
-    cout << "Solde : " << c.solde << endl;
+    std::cout << "Solde : " << c.solde << std::endl;
 }
 
 int main() {
@@ -783,29 +814,28 @@ Comme nous l'avons vu au module 2, les entrées-sorties en C++ reposent sur la n
 #include <fstream>
 #include <iostream>
 #include <string>
-using namespace std;
 
 int main() {
-    ofstream sortie("notes.txt");
+    std::ofstream sortie("notes.txt");
     if (!sortie) {
-        cerr << "Impossible de creer notes.txt" << endl;
+        std::cerr << "Impossible de creer notes.txt" << std::endl;
         return 1;
     }
-    sortie << "INF2005 90" << endl;
+    sortie << "INF2005 90" << std::endl;
     sortie.close();
 
-    ifstream entree("notes.txt");
+    std::ifstream entree("notes.txt");
     if (!entree) {
-        cerr << "Impossible d'ouvrir notes.txt" << endl;
+        std::cerr << "Impossible d'ouvrir notes.txt" << std::endl;
         return 1;
     }
-    string cours;
+    std::string cours;
     int note;
 
     if (entree >> cours >> note) {
-        cout << cours << " : " << note << endl;
+        std::cout << cours << " : " << note << std::endl;
     } else {
-        cerr << "Erreur de lecture du fichier" << endl;
+        std::cerr << "Erreur de lecture du fichier" << std::endl;
     }
     return 0;
 }
@@ -835,7 +865,6 @@ Une liste chaînée est composée de nœuds. Chaque nœud contient une donnée e
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 struct Noeud {
     int valeur;
@@ -844,9 +873,9 @@ struct Noeud {
 
 void afficher(Noeud* tete) {
     for (Noeud* courant = tete; courant != nullptr; courant = courant->suivant) {
-        cout << courant->valeur << " ";
+        std::cout << courant->valeur << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
 }
 ```
 
@@ -859,16 +888,15 @@ Une pile suit le principe LIFO : le dernier élément ajouté est le premier ret
 ```cpp {linenos=table}
 #include <iostream>
 #include <stack>
-using namespace std;
 
 int main() {
-    stack<int> pile;
+    std::stack<int> pile;
     pile.push(-1);
     pile.push(-2);
     pile.push(-3);
 
     while (!pile.empty()) {
-        cout << pile.top() << endl;
+        std::cout << pile.top() << std::endl;
         pile.pop();
     }
     return 0;
@@ -932,18 +960,17 @@ Un itérateur est un objet qui permet de parcourir un conteneur. Il joue un rôl
 ```cpp {linenos=table}
 #include <iostream>
 #include <list>
-using namespace std;
 
 int main() {
-    list<int> entiers = {10, 20, 30};
+    std::list<int> entiers = {10, 20, 30};
 
-    for (list<int>::iterator it = entiers.begin(); it != entiers.end(); ++it) {
-        cout << *it << endl;
+    for (std::list<int>::iterator it = entiers.begin(); it != entiers.end(); ++it) {
+        std::cout << *it << std::endl;
     }
 
     // Version moderne plus simple
     for (int valeur : entiers) {
-        cout << valeur << endl;
+        std::cout << valeur << std::endl;
     }
     return 0;
 }

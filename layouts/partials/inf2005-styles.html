@@ -45,6 +45,10 @@
 .inf2005-boite--synthese  { --inf-fond: #ede9fe; --inf-cadre: #86002d; }
 .inf2005-boite--jupyter   { --inf-fond: #ffedd5; --inf-cadre: #e67300; }
 .inf2005-boite--code      { --inf-fond: #f8fafc; --inf-cadre: #b6bec7; --inf-titre: #0b2545; }
+/* Travaux pratiques : consignebox, livrablebox, baremebox */
+.inf2005-boite--consigne  { --inf-fond: #ecf7ff; --inf-cadre: #0b2545; }
+.inf2005-boite--livrable  { --inf-fond: #e5f8e8; --inf-cadre: #008080; }
+.inf2005-boite--bareme    { --inf-fond: #f5eeff; --inf-cadre: #5729a6; }
 
 /* Bloc « Contenu du module » de la page titre */
 .inf2005-boite--contenu { border-width: 1px; font-size: .92em; }
@@ -111,6 +115,8 @@
 .inf2005-boite:not(.inf2005-boite--fiche) th { background: #0b2545; border-color: #0b2545; color: #ffffff; font-weight: 700; }
 .inf2005-tableau th code,
 .inf2005-boite:not(.inf2005-boite--fiche) th code { color: inherit; background: rgba(255, 255, 255, .15); }
+/* Tableau sans ligne d'en-tête dans le PDF : Markdown impose un en-tête, ici vide, qu'on masque */
+.inf2005-tableau thead tr:not(:has(th:not(:empty))) { display: none; }
 .inf2005-tableau tbody tr:nth-child(even) td,
 .inf2005-boite:not(.inf2005-boite--fiche) tbody tr:nth-child(even) td { background: #ecf7ff; }
 .inf2005-tableau a { color: #0b2545; text-decoration: underline; }

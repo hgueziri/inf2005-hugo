@@ -1,5 +1,9 @@
 ---
 title: "INF 2005 – Programmation orientée objet avec C++"
+# La page d'accueil redirige vers la Présentation (paramètre bookHref du thème hugo-book).
+# Lien relatif : il fonctionne quelle que soit l'adresse du site (GitHub Pages ou hugo server).
+# Le contenu ci-dessous ne s'affiche que si le navigateur ne suit pas la redirection.
+bookHref: "docs/a-propos/presentation/"
 ---
 
 # INF 2005 – Programmation orientée objet avec C++

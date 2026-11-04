@@ -1,0 +1,10 @@
+{{- /*
+  Redirection immédiate d'une page dont le front matter contient bookHref
+  (la page d'accueil vers la Présentation). La balise meta refresh du thème
+  attend la fin du chargement de la page ; ce script redirige dès l'en-tête.
+*/ -}}
+{{- with .Params.BookHref }}
+<script>location.replace({{ . }});</script>
+{{- end }}
+{{- /* Style des boîtes, tableaux et figures du cours (shortcodes boite, tableau, figure-cours), dans chaque page. */ -}}
+{{ partial "inf2005-styles.html" . }}

@@ -3,6 +3,7 @@ title: "Module 2 : Premiers pas en C++, entrées-sorties, opérateurs et structu
 linkTitle: "Module 2"
 description: "INF 2005 – Programmation orientée objet avec C++"
 weight: 20
+bookCollapseSection: true
 ---
 
 {{< figure-cours src="figures/banner_2.png" alt="Bannière du cours INF 2005 – Programmation orientée objet avec C++" largeur="100%" >}}
@@ -25,16 +26,6 @@ weight: 20
 
 {{< boite type="contenu" >}}
 **Contenu du module :** passer de la création d'un premier programme C++ à la réalisation de programmes interactifs utilisant des variables, des calculs, des conditions et des boucles.
-{{< /boite >}}
-
-{{< boite type="fiche" >}}
-| | |
-|---|---|
-| Cours | INF 2005 – Programmation orientée objet avec C++ |
-| Document | Module 2 – Premiers pas en C++ |
-| Thèmes principaux | Compilation et exécution, variables, entrées-sorties, opérateurs, conditions, boucles et résolution de problèmes |
-| Environnement recommandé | VS Code avec `g++` ; Google Colab ou Jupyter en solution de remplacement |
-| Norme recommandée | C++17 ou version plus récente |
 {{< /boite >}}
 
 ## Table des matières {#table-des-matieres}
@@ -402,6 +393,18 @@ int main()
 
 Ce programme fonctionne pour `Montreal`, mais une saisie comme `Quebec City` n'est pas lue entièrement : l'extraction avec `>>` s'arrête au premier espace. Pour lire une ligne complète, on peut utiliser `std::getline(std::cin, ville);` lorsque la variable est de type `std::string`. Si vous combinez `>>` et `std::getline`, il faut faire attention au caractère de fin de ligne restant dans le flot.
 
+{{< boite type="attention" >}}
+Après une lecture avec `>>`, la fin de ligne produite par la touche Entrée reste dans le flot. Un appel à `std::getline()` placé juste après la trouve aussitôt : il renvoie une chaîne vide, sans attendre la saisie. Pour l'éviter, on peut d'abord ignorer les espaces et les fins de ligne restants avec `std::ws` :
+
+```cpp {linenos=table}
+int age = 0;
+std::string nom;
+std::cin >> age;
+std::getline(std::cin >> std::ws, nom);
+```
+
+{{< /boite >}}
+
 {{< boite type="exemple" titre="Exemple guidé" >}}
 **Exercice guidé :** demandez à l'utilisateur la quantité et le prix unitaire d'un article, puis affichez leur produit. Pour commencer, reprenez le programme de lecture d'une quantité et ajoutez une variable `double prixUnitaire = 0.0;`, une deuxième instruction `std::cin` et une multiplication.
 {{< /boite >}}
@@ -435,6 +438,8 @@ int main()
 ```
 
 C++ autorise également des **expressions mixtes**. Par exemple, si `n` est de type `int` et `x` de type `double`, l'expression `n * x` est calculée en type `double` après conversion arithmétique appropriée. Les parenthèses précisent le regroupement des calculs : `(a + b) * c` diffère en général de `a + b * c`. Elles ne garantissent toutefois pas à elles seules l'ordre d'évaluation de tous les opérandes.
+
+Dans un calcul, une valeur de type `char` est d'abord convertie en entier : l'expression `'A' + 1` vaut 66, le code de la lettre B, et elle est de type `int`. Pour obtenir un caractère, on range le résultat dans une variable de type `char`, par exemple `char suivante = 'A' + 1;`.
 
 {{< boite type="attention" >}}
 La division par zéro est invalide. Avant une division par une variable, il faut vérifier que son dénominateur n'est pas nul. Attention également : `7 / 2` produit `3`, même si le résultat est ensuite placé dans une variable `double`.
@@ -704,6 +709,24 @@ int main()
 `break` permet de quitter le `switch`. Sans `break`, l'exécution peut continuer dans le cas suivant : c'est la *chute* (*fallthrough*). Il faut en tenir compte lors de la conception du programme. Le `break` final de `default` est facultatif dans cet exemple.
 {{< /boite >}}
 
+Plusieurs étiquettes peuvent partager le même traitement : il suffit de les placer l'une après l'autre, puisque l'exécution se poursuit jusqu'au prochain `break`. Par exemple, pour accepter une réponse en majuscule ou en minuscule :
+
+```cpp {linenos=table}
+switch (reponse)
+{
+case 'o':
+case 'O':
+    std::cout << "Oui\n";
+    break;
+case 'n':
+case 'N':
+    std::cout << "Non\n";
+    break;
+default:
+    std::cout << "Reponse invalide\n";
+}
+```
+
 {{< boite type="exemple" titre="Exemple guidé" >}}
 **À essayer :** exécutez le menu avec 1, 2, puis 9. Ajoutez ensuite un troisième choix qui affiche `Quitter`. Prédisez chaque sortie avant de compiler.
 {{< /boite >}}
@@ -751,6 +774,24 @@ int main()
 ```
 
 Au départ, `somme` vaut 0 et `i` vaut 1. À chaque passage, on ajoute `i` à `somme`, puis on augmente `i`. Lorsque `i` atteint 11, la condition devient fausse et la boucle s'arrête. Sans `i++`, la condition resterait vraie dans cet exemple : la boucle ne se terminerait pas normalement.
+
+La boucle `while` convient aussi lorsque le nombre de répétitions n'est pas connu à l'avance. Par exemple, on peut lire des valeurs jusqu'à une **valeur sentinelle**, une valeur convenue qui signale la fin de la saisie et qui n'est pas une donnée à traiter :
+
+```cpp {linenos=table}
+int note = 0;
+int somme = 0;
+std::cout << "Note (-1 pour terminer) : ";
+std::cin >> note;
+while (note != -1)
+{
+    somme += note;
+    std::cout << "Note (-1 pour terminer) : ";
+    std::cin >> note;
+}
+std::cout << "Somme : " << somme << '\n';
+```
+
+La première valeur est lue avant la boucle, et chacune des suivantes à la fin d'un tour : la sentinelle arrête la boucle sans jamais être ajoutée à la somme.
 
 ### 6.2. La boucle do/while {#la-boucle-do-while}
 
@@ -877,6 +918,8 @@ int main()
 ```
 
 Dans `main`, `return 0;` termine le programme en indiquant une exécution réussie. Dans une autre fonction, `return` peut également transmettre une valeur à l'appelant. Nous reviendrons sur ce mécanisme lors de l'étude des fonctions.
+
+Dans des boucles imbriquées, `break` et `continue` ne concernent que la boucle la plus intérieure qui les contient : un `break` placé dans la boucle intérieure la termine, puis la boucle extérieure passe à son tour suivant.
 
 {{< boite type="important" >}}
 Pour éviter une boucle infinie, vérifiez toujours que sa condition pourra devenir fausse ou qu'une sortie adaptée est prévue. Pour comprendre une boucle, tracez quelques itérations sur papier avant de l'exécuter.

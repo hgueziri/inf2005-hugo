@@ -7,6 +7,8 @@
 
   Paramètres :
     src     : chemin de l'image (ressource du paquet de page ou URL)
+    page    : (facultatif) page dont src est une ressource, ex. "/docs/modules/module-1"
+              (un travail pratique reprend ainsi la bannière de son module sans la copier)
     id      : (facultatif) ancre visée par les renvois « figure N »
     numero  : (facultatif) numéro affiché dans la légende
     legende : (facultatif) texte de la légende
@@ -14,10 +16,11 @@
     alt     : (facultatif) texte alternatif, la légende par défaut
 */ -}}
 {{- $src := .Get "src" -}}
-{{- with .Page.Resources.Get $src }}{{ $src = .RelPermalink }}{{ end -}}
+{{- $source := .Page -}}
+{{- with .Get "page" }}{{ $source = site.GetPage . }}{{ if not $source }}{{ errorf "figure-cours : page %q introuvable" . }}{{ end }}{{ end -}}
+{{- with $source.Resources.Get $src }}{{ $src = .RelPermalink }}{{ end -}}
 {{- $legende := .Get "legende" | default "" -}}
 {{- $largeur := .Get "largeur" | default "82%" -}}
-{{- if eq .Ordinal 0 }}{{ partial "inf2005-styles.html" . }}{{ end -}}
 <figure class="inf2005-figure"{{ with .Get "id" }} id="{{ . }}"{{ end }}>
   <img src="{{ $src }}" alt="{{ .Get "alt" | default $legende }}" style="{{ printf "width: %s" $largeur | safeCSS }}" loading="lazy">
   {{- if or $legende (.Get "numero") }}

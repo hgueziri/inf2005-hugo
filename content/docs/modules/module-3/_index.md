@@ -3,6 +3,7 @@ title: "Module 3 : Fonctions, tableaux, tri, recherche et chaînes de caractère
 linkTitle: "Module 3"
 description: "INF 2005 – Programmation orientée objet avec C++"
 weight: 30
+bookCollapseSection: true
 ---
 
 {{< figure-cours src="figures/banner_3.png" alt="Bannière du cours INF 2005 – Programmation orientée objet avec C++" largeur="100%" >}}
@@ -24,16 +25,6 @@ weight: 30
 
 {{< boite type="contenu" >}}
 **Contenu du module :** maîtriser l'écriture de fonctions, la manipulation de tableaux, les algorithmes simples de tri et de recherche, ainsi que les chaînes de caractères en C++.
-{{< /boite >}}
-
-{{< boite type="fiche" >}}
-| | |
-|---|---|
-| Cours | INF 2005 – Programmation orientée objet avec C++ |
-| Document | Module 3 – Fonctions et structures de données de base |
-| Thèmes principaux | Fonctions, paramètres, surcharge, fonctions `inline`, tableaux, tri à bulle, recherche linéaire, recherche binaire et chaînes de caractères |
-| Environnement recommandé | Jupyter Notebook et VS Code avec `g++` |
-| Norme recommandée | C++17 ou version plus récente |
 {{< /boite >}}
 
 ## Table des matières {#table-des-matieres}
@@ -209,6 +200,10 @@ Dans cet exemple, les deux variables nommées `resultat` sont **distinctes**. La
 
 {{< boite type="exemple" titre="Vérifier la portée" >}}
 Renommez la variable `resultat` dans `main()` en `valeur`. Le programme fonctionne toujours. Essayez ensuite d'afficher `nombre` directement dans `main()` et expliquez l'erreur du compilateur : `nombre` est un paramètre local à `calculerCarre`.
+{{< /boite >}}
+
+{{< boite type="remarque" titre="Variables globales" >}}
+Une variable déclarée en dehors de toute fonction est une **variable globale** : elle existe pendant toute l'exécution, et toutes les fonctions du fichier peuvent la lire et la modifier. Il vaut mieux l'éviter : une fonction qui utilise une variable globale cache cette dépendance, puisque son en-tête ne la montre pas, et elle ne peut traiter qu'un seul jeu de données. Transmettez plutôt les données par des paramètres et récupérez le résultat avec `return` : l'en-tête de la fonction montre alors ce qu'elle utilise et ce qu'elle produit.
 {{< /boite >}}
 
 ### 3.2. Passage par valeur {#passage-par-valeur}
@@ -523,6 +518,24 @@ int main()
 {{< /boite >}}
 
 Pour une valeur fixée de `ligne`, la boucle intérieure parcourt toutes les colonnes. À la fin de chaque ligne, l'instruction `std::cout << '\n';` passe à la ligne suivante. **Question :** quelle est la valeur de `tableauNotes[1][2]` ? Réponse : `65`.
+
+Pour transmettre un tableau à deux dimensions à une fonction, seule la première dimension peut être omise : le compilateur a besoin du nombre de colonnes pour retrouver la position de chaque case. Le nombre de lignes est transmis en paramètre, comme la taille d'un tableau à une dimension :
+
+```cpp {linenos=table}
+void afficherTableau(int tableau[][4], int lignes)
+{
+    for (int ligne = 0; ligne < lignes; ligne++)
+    {
+        for (int colonne = 0; colonne < 4; colonne++)
+        {
+            std::cout << tableau[ligne][colonne] << ' ';
+        }
+        std::cout << '\n';
+    }
+}
+```
+
+L'appel s'écrit alors `afficherTableau(tableauNotes, 3);`.
 
 ## 6. Rechercher et trier dans les tableaux {#rechercher-et-trier-dans-les-tableaux}
 

@@ -9,6 +9,7 @@
   Paramètres :
     type  : objectif | definition | important | remarque | attention | exemple
             | synthese | jupyter | code | contenu | fiche
+            | consigne | livrable | bareme (travaux pratiques)
     titre : (facultatif) remplace le titre par défaut du type.
 */ -}}
 {{- $titres := dict
@@ -21,10 +22,12 @@
   "synthese"  "Synthèse"
   "jupyter"   "Exécution dans Jupyter Notebook ou VS Code"
   "code"      "Extrait / pseudo-code"
+  "consigne"  "Consignes générales"
+  "livrable"  "Livrables attendus"
+  "bareme"    "Barème d'évaluation"
 -}}
 {{- $type := .Get "type" | default "remarque" -}}
 {{- $titre := .Get "titre" | default (index $titres $type) -}}
-{{- if eq .Ordinal 0 }}{{ partial "inf2005-styles.html" . }}{{ end -}}
 <div class="inf2005-boite inf2005-boite--{{ $type }}">
   {{- with $titre }}
   <div class="inf2005-boite-titre">{{ . }}</div>

@@ -1,0 +1,43 @@
+{{- /*
+  Formulaire anonyme de signalement d'erreurs, intégré à la page.
+
+  Utilisation : {{< signalement >}}
+  Le lien du formulaire est réglé dans hugo.toml, [params.signalement] :
+    formulaire : adresse du formulaire intégré (iframe) ;
+    prerempli  : (facultatif) lien prérempli où la page concernée vaut PAGE.
+  La page concernée arrive dans l'adresse (?page=...) depuis le lien placé sous chaque page
+  (layouts/partials/docs/inject/content-after.html).
+*/ -}}
+{{- $p := site.Params.signalement -}}
+<style>
+.inf2005-signalement-page { margin: 1rem 0; padding: .6rem 1rem; border-left: 4px solid #0b2545; background: #ecf7ff; }
+.inf2005-signalement iframe { display: block; width: 100%; height: 1000px; border: 1px solid #c2d8eb; border-radius: 6px; }
+.inf2005-signalement-secours { font-size: .9em; }
+</style>
+<p class="inf2005-signalement-page" hidden>Page concernée : <strong></strong></p>
+{{- with $p.formulaire }}
+<div class="inf2005-signalement" data-formulaire="{{ . }}" data-prerempli="{{ $p.prerempli }}">
+  <iframe src="{{ . }}" title="Formulaire anonyme de signalement d'erreurs" loading="lazy">Chargement du formulaire…</iframe>
+  <p class="inf2005-signalement-secours">Le formulaire ne s'affiche pas ?
+    <a href="{{ . }}" target="_blank" rel="noopener">Ouvrez-le dans un nouvel onglet</a>.</p>
+</div>
+{{- else }}
+{{- warnf "signalement : params.signalement.formulaire est vide dans hugo.toml, la page %s n'a pas de formulaire" .Page.RelPermalink }}
+<p><em>Le formulaire de signalement sera disponible prochainement.</em></p>
+{{- end }}
+<script>
+(function () {
+  // Page d'où vient l'étudiant : affichée, et transmise au formulaire s'il a un lien prérempli
+  var page = new URLSearchParams(location.search).get("page");
+  if (!page) return;
+  var bloc = document.querySelector(".inf2005-signalement-page");
+  bloc.querySelector("strong").textContent = page;
+  bloc.hidden = false;
+  var f = document.querySelector(".inf2005-signalement");
+  var prerempli = f && f.getAttribute("data-prerempli");
+  if (!prerempli || prerempli.indexOf("PAGE") < 0) return;
+  var url = prerempli.replace("PAGE", encodeURIComponent(page));
+  f.querySelector("iframe").src = url;
+  f.querySelector(".inf2005-signalement-secours a").href = url;
+})();
+</script>

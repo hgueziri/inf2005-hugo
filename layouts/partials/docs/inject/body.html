@@ -1,0 +1,63 @@
+{{- /*
+  Inséré par le thème hugo-book à la fin de chaque page (point d'injection docs/inject/body).
+  Surligne, dans la table des matières de droite, la section en cours de lecture pendant le défilement.
+*/ -}}
+<style>
+.book-toc #TableOfContents a.inf2005-toc-actif {
+  color: #1d4ed8;
+  font-weight: 600;
+  background: #dbeafe;
+  border-radius: 3px;
+}
+</style>
+<script>
+(function () {
+  var toc = document.querySelector(".book-toc #TableOfContents");
+  if (!toc) return;
+  var panneau = toc.closest(".book-toc-content") || toc;  // la table défile dans son propre panneau
+
+  // Titres de la page qui figurent dans la table (les href sont encodés : %c3%a9 pour « é »)
+  var entrees = [];
+  toc.querySelectorAll('a[href^="#"]').forEach(function (lien) {
+    var titre = document.getElementById(decodeURIComponent(lien.getAttribute("href").slice(1)));
+    if (titre) entrees.push({ titre: titre, lien: lien });
+  });
+  if (!entrees.length) return;
+
+  var DECALAGE = 90;  // un titre devient « courant » quand il passe à moins de 90 px du haut de l'écran
+  var actif = null;
+
+  function garderVisible(lien) {
+    var p = panneau.getBoundingClientRect(), l = lien.getBoundingClientRect();
+    if (l.top < p.top || l.bottom > p.bottom) {
+      panneau.scrollTop += l.top - p.top - panneau.clientHeight / 3;
+    }
+  }
+
+  function miseAJour() {
+    var courant = entrees[0];
+    var basAtteint = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    if (basAtteint) {
+      courant = entrees[entrees.length - 1];
+    } else {
+      for (var i = 0; i < entrees.length; i++) {
+        if (entrees[i].titre.getBoundingClientRect().top <= DECALAGE) courant = entrees[i];
+        else break;
+      }
+    }
+    if (courant.lien === actif) return;
+    if (actif) actif.classList.remove("inf2005-toc-actif");
+    actif = courant.lien;
+    actif.classList.add("inf2005-toc-actif");
+    garderVisible(actif);
+  }
+
+  var minuterie = null;  // au plus une mise à jour toutes les 50 ms pendant le défilement
+  window.addEventListener("scroll", function () {
+    if (minuterie) return;
+    minuterie = setTimeout(function () { minuterie = null; miseAJour(); }, 50);
+  }, { passive: true });
+  window.addEventListener("resize", miseAJour);
+  miseAJour();
+})();
+</script>

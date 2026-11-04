@@ -1,0 +1,32 @@
+{{- /*
+  Sous le contenu de chaque page du cours :
+  - à la fin d'un module (ou de son annexe), un renvoi vers le questionnaire d'autoévaluation du module
+    (page autoevaluation.md de la section du module) ;
+  - le lien « Signaler une erreur dans cette page ». Le titre de la page est transmis à la page de
+    signalement (?page=...), qui le reporte dans le formulaire.
+*/ -}}
+{{- $module := cond .IsSection . .Parent -}}
+{{- with and $module (site.GetPage (path.Join $module.Path "autoevaluation")) }}
+{{- if ne . $ }}
+<div class="inf2005-vers-qcm">
+  <strong>Avez-vous bien compris ?</strong>
+  Vérifiez-le avec le <a href="{{ .RelPermalink }}">questionnaire d'autoévaluation du {{ lower $module.LinkTitle }}</a> :
+  {{ len .Params.qcm }} questions à choix multiple, non notées, avec explications.
+</div>
+<style>
+.inf2005-vers-qcm { margin: 2rem 0 0; padding: .8rem 1rem; border: 1px solid #c2d8eb; border-left: 4px solid #0b2545; border-radius: 6px; background: #ecf7ff; }
+.inf2005-vers-qcm a { color: #0b2545; text-decoration: underline; }
+</style>
+{{- end }}
+{{- end }}
+{{- $signalement := site.GetPage "/docs/signaler-une-erreur" -}}
+{{- if and $signalement (not .IsHome) (ne .RelPermalink $signalement.RelPermalink) (trim .RawContent " \n\r") }}
+<p class="inf2005-signaler">
+  {{- /* querify encode déjà le titre : safeURL évite un second encodage */}}
+  <a href="{{ printf "%s?%s" $signalement.RelPermalink (querify "page" .Title) | safeURL }}">Une erreur dans cette page ? Signalez-la anonymement</a>
+</p>
+<style>
+.inf2005-signaler { margin: 2rem 0 0; padding-top: .75rem; border-top: 1px solid #e2e8f0; text-align: right; font-size: .9em; }
+.inf2005-signaler a { color: #475569; }
+</style>
+{{- end }}

@@ -26,17 +26,6 @@ Pour la partie consacrée à la bibliothèque standard, l'objectif est de pouvoi
 **Contenu de l'annexe :** proposer des applications et compléments ciblés, sans répéter les exemples déjà étudiés dans le module principal.
 {{< /boite >}}
 
-{{< boite type="fiche" >}}
-| | |
-|---|---|
-| Cours | INF 2005 – Programmation orientée objet avec C++ |
-| Document | Annexes du module 4 |
-| Rôle du document | Approfondir les notions sans répéter le contenu du module principal |
-| Contenu principal | Héritage virtuel, surcharge d’opérateurs, fichiers, arbres, STL et projets multifichiers |
-| Environnement recommandé | Jupyter Notebook et VS Code avec `g++` |
-| Norme recommandée | C++17 ou version plus récente |
-{{< /boite >}}
-
 ## Table des matières {#table-des-matieres}
 
 - [Comment utiliser cette annexe](#comment-utiliser-cette-annexe)
@@ -90,7 +79,6 @@ Le module principal a présenté le risque d'un *losange* dans une hiérarchie d
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 class Identifiable {
 protected:
@@ -112,7 +100,7 @@ public:
 class FichierNumerique : public Document, public Ressource {
 public:
     FichierNumerique() : Identifiable(99), Document(), Ressource() {}
-    void afficher() const { cout << "id = " << id << endl; }
+    void afficher() const { std::cout << "id = " << id << std::endl; }
 };
 
 int main() {
@@ -144,7 +132,6 @@ Le module principal a présenté l'opérateur `+` sur une classe `Complexe`. Cet
 
 ```cpp {linenos=table}
 #include <iostream>
-using namespace std;
 
 class Complexe {
 private:
@@ -165,7 +152,7 @@ public:
         return *this;
     }
 
-    friend ostream& operator<<(ostream& os, const Complexe& c) {
+    friend std::ostream& operator<<(std::ostream& os, const Complexe& c) {
         os << c.reel;
         if (c.imaginaire < 0) {
             os << " - " << -c.imaginaire << "i";
@@ -175,7 +162,7 @@ public:
         return os;
     }
 
-    friend istream& operator>>(istream& is, Complexe& c) {
+    friend std::istream& operator>>(std::istream& is, Complexe& c) {
         double r, i;
         if (is >> r >> i) {
             c.reel = r;
@@ -189,19 +176,19 @@ int main() {
     Complexe a(1.5, 2.0);
     Complexe b(3.0, 4.5);
     Complexe c = a + b;
-    cout << "a + b = " << c << endl;
+    std::cout << "a + b = " << c << std::endl;
 
     c += Complexe(1, 1);
-    cout << "apres += : " << c << endl;
+    std::cout << "apres += : " << c << std::endl;
 
     // Le format de lecture est : partie_reelle partie_imaginaire.
     // Ex. : -2 3 (deux nombres separes par un espace).
-    cout << "Saisir un complexe (reel imaginaire) : ";
+    std::cout << "Saisir un complexe (reel imaginaire) : ";
     Complexe lu;
-    if (cin >> lu) {
-        cout << "Vous avez saisi : " << lu << '\n';
+    if (std::cin >> lu) {
+        std::cout << "Vous avez saisi : " << lu << '\n';
     } else {
-        cerr << "Saisie invalide.\n";
+        std::cerr << "Saisie invalide.\n";
     }
     return 0;
 }
@@ -212,7 +199,7 @@ Les opérateurs `.`, `.*`, `::`, `?:` et `sizeof` ne peuvent pas être surcharg�
 {{< /boite >}}
 
 {{< boite type="remarque" titre="Remarque" >}}
-Contrairement à l'affichage `2 + 3i`, l'opérateur d'extraction de cet exemple attend **deux nombres séparés par un espace**, par exemple `2 3`. L'usage de variables temporaires empêche de modifier partiellement l'objet si une des lectures échoue. La fonction renvoie le flot afin que l'on puisse écrire `if (cin >> c)` ou chaîner plusieurs lectures.
+Contrairement à l'affichage `2 + 3i`, l'opérateur d'extraction de cet exemple attend **deux nombres séparés par un espace**, par exemple `2 3`. L'usage de variables temporaires empêche de modifier partiellement l'objet si une des lectures échoue. La fonction renvoie le flot afin que l'on puisse écrire `if (std::cin >> c)` ou chaîner plusieurs lectures.
 {{< /boite >}}
 
 ## Annexe 3. Fichiers texte : lecture fiable et formatage {#fichiers-texte-lecture-fiable-et-formatage}
@@ -221,19 +208,18 @@ Contrairement à l'affichage `2 + 3i`, l'opérateur d'extraction de cet exemple 
 
 ### 3.1. Écriture et lecture d'un fichier texte {#ecriture-et-lecture-d-un-fichier-texte}
 
-Contrairement au court exemple du module principal, ce programme traite plusieurs enregistrements et distingue une fin de fichier normale d'une erreur de format. Il crée d'abord un fichier `etudiants.txt`, puis le rouvre pour lire les noms et les notes. Les fichiers sont créés dans le **répertoire de travail** du programme : ce n'est pas nécessairement le dossier visible dans l'éditeur. Les opérateurs `<<` et `>>` fonctionnent ici sur des flots de fichiers, comme ils fonctionnent avec `cout` et `cin`.
+Contrairement au court exemple du module principal, ce programme traite plusieurs enregistrements et distingue une fin de fichier normale d'une erreur de format. Il crée d'abord un fichier `etudiants.txt`, puis le rouvre pour lire les noms et les notes. Les fichiers sont créés dans le **répertoire de travail** du programme : ce n'est pas nécessairement le dossier visible dans l'éditeur. Les opérateurs `<<` et `>>` fonctionnent ici sur des flots de fichiers, comme ils fonctionnent avec `std::cout` et `std::cin`.
 
 ```cpp {linenos=table}
 #include <fstream>
 #include <iostream>
 #include <string>
-using namespace std;
 
 int main() {
     {
-        ofstream sortie("etudiants.txt");
+        std::ofstream sortie("etudiants.txt");
         if (!sortie) {
-            cerr << "Impossible de creer le fichier." << endl;
+            std::cerr << "Impossible de creer le fichier." << std::endl;
             return 1;
         }
         sortie << "Amina 87\n";
@@ -241,25 +227,25 @@ int main() {
         sortie << "Lea 92\n";
         sortie.flush();
         if (!sortie) {
-            cerr << "Erreur pendant l'ecriture du fichier." << endl;
+            std::cerr << "Erreur pendant l'ecriture du fichier." << std::endl;
             return 1;
         }
     }
 
-    ifstream entree("etudiants.txt");
+    std::ifstream entree("etudiants.txt");
     if (!entree) {
-        cerr << "Impossible d'ouvrir le fichier." << endl;
+        std::cerr << "Impossible d'ouvrir le fichier." << std::endl;
         return 1;
     }
 
-    string nom;
+    std::string nom;
     int note;
     while (entree >> nom >> note) {
-        cout << nom << " : " << note << endl;
+        std::cout << nom << " : " << note << std::endl;
     }
 
     if (!entree.eof()) {
-        cerr << "Erreur de format dans le fichier." << endl;
+        std::cerr << "Erreur de format dans le fichier." << std::endl;
         return 1;
     }
     return 0;
@@ -275,23 +261,26 @@ Vérifier l'ouverture d'un fichier n'est pas suffisant : il faut aussi contrôle
 ```cpp {linenos=table}
 #include <iomanip>
 #include <iostream>
-using namespace std;
 
 int main() {
     double prix = 12.5;
     double taxe = 1.14975;
 
-    cout << fixed << setprecision(2);
-    cout << "Prix avec taxe : " << prix * taxe << " $" << endl;
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "Prix avec taxe : " << prix * taxe << " $" << std::endl;
 
-    cout << setw(12) << left << "Article" << setw(8) << right << "Prix" << endl;
-    cout << setw(12) << left << "Livre"   << setw(8) << right << prix << endl;
+    std::cout << std::setw(12) << std::left << "Article" << std::setw(8) << std::right << "Prix" << std::endl;
+    std::cout << std::setw(12) << std::left << "Livre"   << std::setw(8) << std::right << prix << std::endl;
     return 0;
 }
 ```
 
 {{< boite type="exemple" titre="Sortie attendue :" >}}
 Les lignes `Amina : 87`, `Karim : 74` et `Lea : 92`. Pour tester la gestion des erreurs, modifiez volontairement une ligne du fichier en remplaçant une note numérique par un texte, puis relancez uniquement la partie lecture dans un programme séparé : l'exécution doit signaler un format invalide.
+{{< /boite >}}
+
+{{< boite type="important" >}}
+Les manipulateurs n'ont pas tous la même durée d'effet. `std::setw()` ne s'applique qu'à la prochaine valeur écrite : il faut le répéter devant chaque colonne, comme dans l'exemple. `std::fixed`, `std::setprecision()`, `std::left` et `std::right` restent au contraire en vigueur pour toutes les écritures suivantes du flot. Enfin, sans `std::fixed`, `std::setprecision(2)` fixe le nombre de chiffres significatifs, et non le nombre de décimales.
 {{< /boite >}}
 
 ## Annexe 4. Arbre binaire de recherche : implémentation guidée (approfondissement) {#arbre-binaire-de-recherche-implementation-guidee-approfondissement}
@@ -356,6 +345,8 @@ int main() {
 Cette structure **n'est pas autoéquilibrée**. Si l'on insère des valeurs déjà triées, l'arbre peut devenir une chaîne et la recherche peut nécessiter de parcourir tous ses nœuds. Pour une collection triée dans une application réelle, des conteneurs comme `std::set` et `std::map` évitent d'écrire soi-même une structure arborescente.
 {{< /boite >}}
 
+Le parcours infixe utilisé par `afficherCroissant()` visite le sous-arbre gauche, puis le nœud, puis le sous-arbre droit : dans un arbre binaire de recherche, il donne les valeurs en ordre croissant. Deux autres ordres de parcours sont courants. Le parcours **préfixe** visite le nœud avant ses deux sous-arbres : il commence par la racine. Le parcours **postfixe** visite les deux sous-arbres avant le nœud : la racine vient en dernier. D'un parcours à l'autre, seule la position de l'affichage par rapport aux deux appels récursifs change.
+
 ## Annexe 5. STL : manipuler des données et choisir un conteneur {#stl-manipuler-des-donnees-et-choisir-un-conteneur}
 
 Le module 4 donne une vue d'ensemble de la STL. Nous détaillons ici les opérations courantes d'un `vector`, puis les différences de choix entre conteneurs. Le même exemple de notes sert à introduire ensuite les itérateurs et les algorithmes génériques.
@@ -367,7 +358,7 @@ Un `vector<int>` contient une séquence d'entiers, rangés de manière contiguë
 {{< tableau >}}
 | Expression | Effet |
 |---|---|
-| `vector<int> notes = {70, 82};` | Créer un vecteur contenant deux entiers. |
+| `std::vector<int> notes = {70, 82};` | Créer un vecteur contenant deux entiers. |
 | `notes.push_back(91);` | Ajouter 91 à la fin du vecteur. |
 | `notes.size()` | Obtenir le nombre d'éléments. |
 | `notes[0]` | Accéder au premier élément, sans vérification des bornes. |
@@ -409,6 +400,8 @@ Premiere note : 70
 {{< boite type="important" >}}
 Les indices commencent à 0. Pour un vecteur de trois éléments, les indices valides sont 0, 1 et 2. L'accès `notes[3]` est hors limites et provoque un comportement indéfini ; `notes.at(3)` détecte cette erreur en lançant une exception. Pour débuter, privilégiez `at()` quand la validité de l'indice n'est pas certaine.
 {{< /boite >}}
+
+Un `std::vector` est un objet : passé par valeur à une fonction, il est copié en entier, et la fonction ne modifie que sa copie. Un tableau C, au contraire, n'est pas copié, et la fonction modifie le tableau de l'appelant (module 3). Pour qu'une fonction modifie le vecteur de l'appelant, on le passe par référence (`std::vector<int>& notes`) ; pour le consulter sans le copier, par référence constante (`const std::vector<int>& notes`).
 
 ### 5.2. Choisir un conteneur adapté au problème {#choisir-un-conteneur-adapte-au-probleme}
 
@@ -577,6 +570,8 @@ L'expression `[](int note) { return note >= 60; }` définit une **fonction lambd
 `std::sort()` nécessite des itérateurs à accès aléatoire, fournis notamment par `vector` et `deque`. Il ne s'applique pas directement à un `std::list`, qui possède sa propre méthode `list.sort()`. Attention également : après le tri, les **positions des valeurs ont changé**. L'indice retourné par la recherche correspond au vecteur *trié*.
 {{< /boite >}}
 
+La valeur initiale de `std::accumulate` détermine le type du calcul : avec `0`, de type `int`, chaque somme partielle est convertie en entier, et les décimales des éléments d'un `std::vector<double>` sont perdues. Il faut alors écrire `0.0`. Par ailleurs, `std::sort` compare les éléments avec l'opérateur `<` : pour trier les objets d'une classe, celle-ci doit définir cet opérateur (module 4, section 5.1).
+
 ### 6.2. Exercice guidé : manipuler les notes {#exercice-guide-manipuler-les-notes}
 
 À partir du programme précédent, réalisez successivement les modifications suivantes :
@@ -605,6 +600,10 @@ Les classes `Article` et `Boisson` ont déjà été étudiées dans le module pr
 | `Boisson.h` | Déclaration de la classe dérivée `Boisson`. | Observer la syntaxe de l'héritage. |
 | `main.cpp` | Programme principal. | Créer les objets et tester les méthodes. |
 {{< /tableau >}}
+
+{{< boite type="remarque" titre="Remarque" >}}
+Un en-tête est inclus dans chaque fichier `.cpp` qui en a besoin. S'il contenait la définition d'une fonction non membre, ou celle d'une méthode écrite hors de sa classe, chacun de ces fichiers en recevrait une copie, et l'éditeur de liens signalerait une définition multiple. Les gardes d'inclusion (`#ifndef ARTICLE_H` ou `#pragma once`) évitent seulement qu'un même fichier `.cpp` inclue deux fois l'en-tête : elles ne remplacent pas la séparation entre déclarations et définitions.
+{{< /boite >}}
 
 ### 7.1. Exemple : `Article.h` {#exemple-article-h}
 
@@ -638,9 +637,8 @@ public:
 ```cpp {linenos=table}
 #include "Article.h"
 #include <iostream>
-using namespace std;
 
-Article::Article(string nomArticle, double prixArticle,
+Article::Article(std::string nomArticle, double prixArticle,
                  int quantiteArticle, double tauxTaxe)
     : nom(nomArticle), prix(prixArticle),
       quantite(quantiteArticle), taxe(tauxTaxe) {}
@@ -650,7 +648,7 @@ double Article::prixAvecTaxe() const {
 }
 
 void Article::afficher() const {
-    cout << nom << " : " << prixAvecTaxe() << " $" << endl;
+    std::cout << nom << " : " << prixAvecTaxe() << " $" << std::endl;
 }
 ```
 
@@ -682,9 +680,8 @@ public:
 ```cpp {linenos=table}
 #include "Boisson.h"
 #include <iostream>
-using namespace std;
 
-Boisson::Boisson(string nom, double prix, int volume, int quantite)
+Boisson::Boisson(std::string nom, double prix, int volume, int quantite)
     : Article(nom, prix, quantite), volumeMl(volume) {}
 
 int Boisson::getVolume() const {
@@ -693,7 +690,7 @@ int Boisson::getVolume() const {
 
 void Boisson::afficher() const {
     Article::afficher();
-    cout << "Volume : " << volumeMl << " ml" << endl;
+    std::cout << "Volume : " << volumeMl << " ml" << std::endl;
 }
 ```
 

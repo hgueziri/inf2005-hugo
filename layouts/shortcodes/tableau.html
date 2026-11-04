@@ -8,7 +8,6 @@
     | ... | ... |
     {{< /tableau >}}
 */ -}}
-{{- if eq .Ordinal 0 }}{{ partial "inf2005-styles.html" . }}{{ end -}}
 <div class="inf2005-tableau">
 {{ .InnerDeindent | .Page.RenderString (dict "display" "block") }}
 </div>

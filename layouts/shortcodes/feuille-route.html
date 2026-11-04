@@ -1,0 +1,202 @@
+{{- /*
+  Feuille de route du cours sous forme de tableau semaine par semaine, que l'étudiant peut adapter
+  (clic sur une case) et exporter en PDF (impression du navigateur).
+
+  Utilisation : {{< feuille-route >}} dans une page dont le front matter contient :
+    feuille_route:
+      semaines: 15
+      lignes:
+        - groupe: "Module 1"          # intertitre, lien facultatif
+          lien: "/docs/modules/module-1"
+        - nom: "Travail pratique 1"   # activité
+          lien: "/docs/evaluation/travail-pratique-1"
+          ponderation: "10 %"         # présent = évaluation (case rose), absent = étude (case bleue)
+          semaines: [2]
+
+  Les choix de l'étudiant sont enregistrés dans son navigateur. La clé dépend du contenu de la
+  feuille proposée : si elle change, chacun repart de la nouvelle version.
+*/ -}}
+{{- $fr := .Page.Params.feuille_route -}}
+{{- $n := int ($fr.semaines | default 15) -}}
+{{- $cle := printf "inf2005-feuille-route-%s" (md5 (jsonify $fr)) -}}
+<style>
+.inf2005-fdr-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin: 1.25rem 0 .5rem; }
+.inf2005-fdr-actions label { font-size: .9em; }
+.inf2005-fdr-actions input { font: inherit; padding: .15rem .3rem; }
+.inf2005-fdr-actions button {
+  font: inherit; font-size: .9em; cursor: pointer;
+  border: 1px solid #0b2545; border-radius: 4px; padding: .35rem .9rem;
+  background: #0b2545; color: #ffffff;
+}
+.inf2005-fdr-actions button.inf2005-fdr-secondaire { background: #ffffff; color: #0b2545; }
+.inf2005-fdr-aide { font-size: .9em; color: #475569; margin: 0 0 .75rem; }
+.inf2005-fdr-cours { display: none; font-weight: 700; margin: 0 0 .5rem; }
+.inf2005-fdr-defilement { overflow-x: auto; }
+.inf2005-fdr table { display: table; width: 100%; border-collapse: collapse; font-size: .85em; margin: 0; }
+/* Sélecteurs préfixés par .markdown pour l'emporter sur les règles de tableau du thème (.markdown table tr td) */
+.markdown .inf2005-fdr table tr th, .markdown .inf2005-fdr table tr td {
+  border: 1px solid #c2d8eb; padding: .3rem .35rem; text-align: center; color: #0f172a;
+}
+.markdown .inf2005-fdr table thead tr th { background: #0b2545; border-color: #0b2545; color: #ffffff; }
+.markdown .inf2005-fdr table tbody tr th { background: #ffffff; text-align: left; font-weight: 400; white-space: nowrap; }
+.markdown .inf2005-fdr table tbody tr.inf2005-fdr-groupe th { background: #ecf7ff; color: #0b2545; font-weight: 700; }
+.markdown .inf2005-fdr table tbody tr td { min-width: 2.4em; background: #ffffff; cursor: pointer; white-space: nowrap; font-size: .9em; }
+.markdown .inf2005-fdr table tbody tr td:hover,
+.markdown .inf2005-fdr table tbody tr td:focus { outline: 2px solid #1d4ed8; outline-offset: -2px; }
+.markdown .inf2005-fdr table tr[data-type="etude"] td.inf2005-fdr-actif { background: #c6d9f1; }
+.markdown .inf2005-fdr table tr[data-type="evaluation"] td.inf2005-fdr-actif { background: #f2dbdb; font-weight: 700; }
+.inf2005-fdr-date { display: block; font-size: .75em; font-weight: 400; white-space: pre-line; line-height: 1.15; }
+.inf2005-fdr-legende { font-size: .85em; margin-top: .5rem; }
+.inf2005-fdr-legende span { display: inline-block; width: 1em; height: 1em; margin: 0 .3rem 0 1rem; vertical-align: -.15em; border: 1px solid #c2d8eb; }
+.inf2005-fdr-legende span:first-child { margin-left: 0; }
+
+/* Version PDF : seulement le titre, le texte et le tableau, en paysage, avec les couleurs */
+@page { size: landscape; margin: 12mm; }
+@media print {
+  .book-header, .book-menu, .book-toc, .book-footer,
+  .inf2005-fdr-actions, .inf2005-fdr-aide { display: none !important; }
+  a::after { content: none !important; }
+  .inf2005-fdr-cours { display: block; }
+  .inf2005-fdr-defilement { overflow: visible; }
+  .markdown .inf2005-fdr table tbody tr td { min-width: 0; }
+  .inf2005-fdr th, .inf2005-fdr td, .inf2005-fdr-legende span {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+}
+</style>
+<div class="inf2005-fdr" data-cle="{{ $cle }}">
+  <div class="inf2005-fdr-actions">
+    <label>Début de la session : <input type="date" class="inf2005-fdr-debut"></label>
+    <button type="button" data-action="pdf">Générer le PDF</button>
+    <button type="button" data-action="reinitialiser" class="inf2005-fdr-secondaire">Revenir à la feuille de route proposée</button>
+  </div>
+  <p class="inf2005-fdr-aide">Cliquez sur une case pour ajouter ou retirer une semaine à une activité. Indiquez la date de début de la session pour afficher les dates. Vos modifications sont enregistrées dans ce navigateur seulement.</p>
+  <p class="inf2005-fdr-cours">{{ site.Title }}</p>
+  <div class="inf2005-fdr-defilement">
+    <table>
+      <thead>
+        <tr><th rowspan="2">Activité</th><th colspan="{{ $n }}">Semaines</th></tr>
+        <tr>
+          {{- range seq $n }}
+          <th data-s="{{ . }}">{{ . }}<span class="inf2005-fdr-date"></span></th>
+          {{- end }}
+        </tr>
+      </thead>
+      <tbody>
+        {{- range $i, $l := $fr.lignes }}
+        {{- if $l.groupe }}
+        <tr class="inf2005-fdr-groupe">
+          <th colspan="{{ add $n 1 }}">{{ with $l.lien }}<a href="{{ relref $.Page . }}">{{ $l.groupe }}</a>{{ else }}{{ $l.groupe }}{{ end }}</th>
+        </tr>
+        {{- else }}
+        {{- $semaines := $l.semaines | default slice -}}
+        {{- $premiere := cond (gt (len $semaines) 0) (index (sort $semaines) 0) 0 -}}
+        <tr data-ligne="{{ $i }}" data-type="{{ cond (isset $l "ponderation") "evaluation" "etude" }}"
+            data-ponderation="{{ $l.ponderation }}" data-defaut="{{ jsonify $semaines }}">
+          <th>{{ with $l.lien }}<a href="{{ relref $.Page . }}">{{ $l.nom }}</a>{{ else }}{{ $l.nom }}{{ end }}</th>
+          {{- range $s := seq $n }}
+          {{- $actif := in $semaines $s }}
+          <td data-s="{{ $s }}" tabindex="0" role="button" aria-label="{{ $l.nom }}, semaine {{ $s }}"
+              aria-pressed="{{ $actif }}"{{ if $actif }} class="inf2005-fdr-actif"{{ end }}>
+            {{- if and $actif (eq $s $premiere) }}{{ $l.ponderation }}{{ end -}}
+          </td>
+          {{- end }}
+        </tr>
+        {{- end }}
+        {{- end }}
+      </tbody>
+    </table>
+  </div>
+  <p class="inf2005-fdr-legende">
+    <span style="background:#c6d9f1"></span>Étude
+    <span style="background:#f2dbdb"></span>Évaluation (pondération)
+  </p>
+</div>
+<script>
+(function () {
+  var fdr = document.currentScript.previousElementSibling;
+  var cle = fdr.getAttribute("data-cle");
+  var lignes = Array.prototype.slice.call(fdr.querySelectorAll("tbody tr[data-ligne]"));
+  var champDebut = fdr.querySelector(".inf2005-fdr-debut");
+
+  function lire() { try { return JSON.parse(localStorage.getItem(cle)) || {}; } catch (e) { return {}; } }
+  function ecrire(etat) { try { localStorage.setItem(cle, JSON.stringify(etat)); } catch (e) {} }
+
+  function semainesDe(tr) {
+    return Array.prototype.map.call(tr.querySelectorAll("td.inf2005-fdr-actif"), function (td) {
+      return Number(td.getAttribute("data-s"));
+    });
+  }
+
+  // Colore les cases d'une ligne ; la pondération s'affiche dans la première semaine retenue
+  function appliquer(tr, semaines) {
+    var premiere = null;
+    Array.prototype.forEach.call(tr.querySelectorAll("td"), function (td) {
+      var actif = semaines.indexOf(Number(td.getAttribute("data-s"))) >= 0;
+      td.classList.toggle("inf2005-fdr-actif", actif);
+      td.setAttribute("aria-pressed", actif);
+      td.textContent = "";
+      if (actif && !premiere) premiere = td;
+    });
+    if (premiere) premiere.textContent = tr.getAttribute("data-ponderation") || "";
+  }
+
+  function afficherDates(debut) {
+    var d0 = null;
+    if (debut) { var p = debut.split("-"); d0 = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])); }
+    Array.prototype.forEach.call(fdr.querySelectorAll("thead th[data-s]"), function (th) {
+      var date = "";
+      if (d0) {
+        var d = new Date(d0);
+        d.setDate(d.getDate() + 7 * (Number(th.getAttribute("data-s")) - 1));
+        // jour et mois sur deux lignes pour garder des colonnes étroites
+        date = d.getDate() + "\n" + d.toLocaleDateString("fr-CA", { month: "short" });
+      }
+      th.querySelector(".inf2005-fdr-date").textContent = date;
+    });
+  }
+
+  function enregistrer() {
+    var etat = { lignes: {}, debut: champDebut.value };
+    lignes.forEach(function (tr) { etat.lignes[tr.getAttribute("data-ligne")] = semainesDe(tr); });
+    ecrire(etat);
+  }
+
+  function basculer(td) {
+    td.classList.toggle("inf2005-fdr-actif");
+    var tr = td.parentNode;
+    appliquer(tr, semainesDe(tr));
+    enregistrer();
+  }
+
+  // Rétablit les choix enregistrés
+  var etat = lire();
+  if (etat.lignes) {
+    lignes.forEach(function (tr) {
+      var s = etat.lignes[tr.getAttribute("data-ligne")];
+      if (s) appliquer(tr, s);
+    });
+  }
+  if (etat.debut) { champDebut.value = etat.debut; afficherDates(etat.debut); }
+
+  fdr.addEventListener("click", function (e) {
+    var td = e.target.closest("tbody td");
+    if (td) { basculer(td); return; }
+    var bouton = e.target.closest("button[data-action]");
+    if (!bouton) return;
+    if (bouton.getAttribute("data-action") === "pdf") {
+      window.print();
+    } else {
+      lignes.forEach(function (tr) { appliquer(tr, JSON.parse(tr.getAttribute("data-defaut"))); });
+      champDebut.value = "";
+      afficherDates("");
+      try { localStorage.removeItem(cle); } catch (e2) {}
+    }
+  });
+  fdr.addEventListener("keydown", function (e) {
+    var td = e.target.closest("tbody td");
+    if (td && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); basculer(td); }
+  });
+  champDebut.addEventListener("change", function () { afficherDates(champDebut.value); enregistrer(); });
+})();
+</script>
